@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<title>个人读书会</title>
+<style>
+:root{--font-serif:Georgia,'Times New Roman','Songti SC','STSong','SimSun',serif;--font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei','WenQuanYi Micro Hei',sans-serif;--radius:16px;--radius-sm:10px;--transition:.5s cubic-bezier(.22,1,.36,1);--bg:#1a1410;--bg2:#231c16;--card:rgba(40,32,26,.9);--hover:rgba(60,48,38,.5);--text:#f0ebe6;--text2:#c8bcb0;--text3:#9a8e82;--accent:#c8a87c;--accent2:#dab892;--border:rgba(200,180,160,.12);--border2:rgba(200,180,160,.06);--shadow:0 4px 24px rgba(0,0,0,.2)}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.6}
+canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.3}
+.app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;max-width:1100px;margin:0 auto;padding:0 16px}
+.header{display:flex;align-items:center;justify-content:space-between;padding:14px 0 10px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:6px}
+.logo{font-family:var(--font-serif);font-size:17px;font-weight:700;color:var(--text);letter-spacing:1px}
+.dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--accent);margin-right:6px;vertical-align:middle}
+.hr{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.env{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px}
+.xpb{display:flex;align-items:center;gap:4px;padding:3px 8px;border-radius:12px;border:1px solid var(--border);font-size:10px;color:var(--accent);font-weight:600;cursor:pointer;transition:var(--transition);background:rgba(200,168,120,.04)}
+.xpb:hover{background:rgba(200,168,120,.09)}
+.xpbs{width:38px;height:3px;background:rgba(200,168,120,.08);border-radius:2px;overflow:hidden}
+.xpbs .f{height:100%;background:linear-gradient(90deg,var(--accent),#e0c8a0);border-radius:2px;transition:width .6s}
+.stg{background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;padding:3px;border-radius:5px;transition:var(--transition)}
+.stg:hover{background:var(--hover);color:var(--text2)}
+.nav{display:flex;gap:2px;padding:8px 0;border-bottom:1px solid var(--border2);overflow-x:auto}
+.nb{padding:5px 12px;border:none;background:transparent;color:var(--text3);font-size:12px;font-weight:500;cursor:pointer;border-radius:var(--radius-sm);transition:var(--transition);font-family:var(--font-sans);white-space:nowrap;flex-shrink:0}
+.nb:hover{color:var(--text2);background:var(--hover)}
+.nb.act{color:var(--accent);background:rgba(200,168,120,.1)}
+.nb .bd{display:inline-block;background:var(--accent);color:var(--bg);font-size:9px;padding:1px 5px;border-radius:7px;font-weight:700;margin-left:2px}
+.main{flex:1;padding:14px 0 36px}
+.pn{display:none;animation:i .4s ease}
+.pn.act{display:block}
+@keyframes i{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ct{background:var(--card);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:1px solid var(--border);backdrop-filter:blur(10px)}
+.ctt{font-family:var(--font-serif);font-size:14px;font-weight:600;margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.gt{font-family:var(--font-serif);font-size:24px;font-weight:700;color:var(--text);margin-bottom:2px}
+.gs{font-size:13px;color:var(--text3);margin-bottom:14px}
+.st{display:grid;grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:8px;margin-bottom:12px}
+.sc{background:rgba(255,248,240,.03);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:10px 6px;text-align:center}
+.sc .n{font-size:20px;font-weight:700;color:var(--text);font-family:var(--font-serif)}
+.sc .l{font-size:9px;color:var(--text3);margin-top:1px}
+.sc .t{font-size:9px;margin-top:2px}.sc .t.up{color:#7ab87a}.sc .t.hot{color:var(--accent)}
+.cb{display:flex;gap:14px;align-items:flex-start}
+.cbcv{width:72px;height:106px;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:var(--shadow);position:relative;overflow:hidden}
+.cbcv .cl{position:absolute;bottom:0;left:0;right:0;padding:2px 4px;font-size:7px;text-align:center;font-weight:600;color:#fff}
+.cbi{flex:1;min-width:0}
+.cbt{font-family:var(--font-serif);font-size:17px;font-weight:700;color:var(--text);margin-bottom:1px}
+.cba{font-size:12px;color:var(--text2);margin-bottom:3px}
+.cbc{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:7px;font-size:10px;font-weight:500;margin-bottom:4px}
+.pb{height:4px;background:rgba(200,180,160,.08);border-radius:3px;overflow:hidden}
+.pb .f{height:100%;background:linear-gradient(90deg,var(--accent),#e0c8a0);border-radius:3px;transition:width .8s}
+.pbt{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:2px}
+.cba2{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:4px;padding:6px 14px;border-radius:var(--radius-sm);border:none;font-size:11px;font-weight:600;cursor:pointer;transition:var(--transition);font-family:var(--font-sans)}
+.bp{background:linear-gradient(135deg,var(--accent),#b8946a);color:var(--bg);box-shadow:0 2px 6px rgba(200,168,120,.18)}
+.bp:hover{transform:translateY(-1px);box-shadow:0 3px 12px rgba(200,168,120,.25)}
+.bs{background:rgba(200,180,160,.06);color:var(--text2);border:1px solid var(--border)}
+.bs:hover{background:rgba(200,180,160,.11)}
+.bsm{padding:4px 10px;font-size:10px}
+.lhh{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:6px}
+.lhh input{background:rgba(255,248,240,.04);border:1px solid var(--border);border-radius:var(--radius-sm);padding:6px 10px;color:var(--text);font-size:11px;width:160px;outline:none;transition:var(--transition);font-family:var(--font-sans)}
+.lhh input:focus{border-color:rgba(200,168,120,.3)}
+.lhh input::placeholder{color:var(--text3)}
+.la{display:flex;gap:6px;align-items:center}
+.cf{display:flex;gap:3px;flex-wrap:wrap;margin-bottom:10px}
+.ctg{padding:2px 8px;border-radius:9px;font-size:9px;font-weight:500;cursor:pointer;transition:var(--transition);background:rgba(200,180,160,.04);color:var(--text3);border:1px solid transparent}
+.ctg:hover{background:rgba(200,180,160,.08);color:var(--text2)}
+.ctg.act{color:#fff;border-color:currentColor}
+.lg{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.lb{cursor:pointer;border-radius:var(--radius-sm);padding:7px;background:rgba(255,248,240,.02);border:1px solid transparent;transition:var(--transition)}
+.lb:hover{background:rgba(255,248,240,.05);border-color:var(--border)}
+.lcv{width:100%;aspect-ratio:2/3;border-radius:3px;margin-bottom:5px;display:flex;align-items:center;justify-content:center;font-size:22px;position:relative;overflow:hidden}
+.lcv .lbg{position:absolute;bottom:0;left:0;right:0;padding:1px 4px;font-size:7px;text-align:center;font-weight:600;color:#fff}
+.lt{font-size:11px;font-weight:600;color:var(--text);margin-bottom:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.la2{font-size:9px;color:var(--text3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lst{font-size:8px;padding:1px 5px;border-radius:5px;display:inline-block;margin-top:2px;font-weight:500}
+.lst.r{background:rgba(200,168,120,.1);color:var(--accent)}
+.lst.d{background:rgba(122,184,122,.1);color:#7ab87a}
+.lst.p{background:rgba(200,180,160,.04);color:var(--text3)}
+.lem{padding:28px 10px;text-align:center;color:var(--text3);font-size:12px}
+.lem .ei{font-size:30px;margin-bottom:6px;opacity:.3}
+.rh{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-wrap:wrap;gap:4px}
+.rs{font-size:12px;color:var(--text2);margin-bottom:6px}
+.rch{font-family:var(--font-serif);font-size:22px;font-weight:700;color:var(--text);margin-bottom:2px}
+.rt{font-size:34px;font-weight:200;color:var(--text2);font-variant-numeric:tabular-nums;text-align:center;margin:8px 0}
+.rt .u{font-size:10px;color:var(--text3);display:block;margin-top:-3px;font-weight:400}
+.ra{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin:10px 0}
+.ls{border-radius:var(--radius-sm);padding:12px;margin-top:8px;background:rgba(200,168,120,.04);border:1px solid rgba(200,168,120,.07)}
+.lh{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.lav{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0}
+.li{flex:1}.ln{font-weight:600;font-size:12px;color:var(--text)}.ls2{font-size:9px;color:var(--text3)}
+.lbg{padding:1px 6px;border-radius:6px;font-size:9px;font-weight:600}
+.lbg.h{background:rgba(200,168,120,.12);color:var(--accent)}
+.lbg.y{background:rgba(122,184,122,.12);color:#7ab87a}
+.lbg.w{background:rgba(200,180,160,.05);color:var(--text3)}
+.lp{padding:8px 12px;background:rgba(0,0,0,.15);border-radius:var(--radius-sm);margin:6px 0;border-left:3px solid var(--accent);font-family:var(--font-serif);font-size:12px;line-height:1.7;color:var(--text2);font-style:italic}
+.lp .sr{font-style:normal;font-size:9px;color:var(--text3);margin-top:3px;display:block}
+.lt2{font-size:12px;color:var(--text2);line-height:1.6;margin-top:4px}
+.lac{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.cm{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.cm2{display:flex;align-items:center;gap:5px;padding:4px 8px;border-radius:12px;font-size:10px;transition:var(--transition)}
+.cm2 .ma{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;flex-shrink:0}
+.cm2 .mn{color:var(--text2)}.cm2 .mr{font-size:8px;padding:1px 4px;border-radius:4px;font-weight:600;color:var(--accent);background:rgba(200,168,120,.07)}
+.cm2.you{border:1px solid rgba(122,184,122,.12);background:rgba(122,184,122,.03)}
+.di{padding:7px 0;border-bottom:1px solid var(--border2)}
+.di:last-child{border-bottom:none}
+.di .q{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:2px}
+.di .tg{display:inline-block;font-size:8px;padding:1px 5px;border-radius:5px;margin-right:2px}
+.di .tg.t1{background:rgba(200,168,120,.08);color:var(--accent)}
+.di .tg.t2{background:rgba(122,184,122,.08);color:#7ab87a}
+.di .tg.t3{background:rgba(180,200,255,.08);color:rgba(180,200,255,.7)}
+.di .dr{font-size:10px;color:var(--text3);margin-top:3px;display:flex;align-items:center;gap:4px}
+.di .dr textarea{background:rgba(255,248,240,.04);border:1px solid var(--border2);border-radius:6px;padding:4px 8px;color:var(--text2);font-size:11px;width:100%;outline:none;resize:none;font-family:var(--font-sans);min-height:36px}
+.di .dr textarea:focus{border-color:rgba(200,168,120,.25)}
+.du,.drp{padding:4px 8px;margin-top:4px;border-radius:6px;font-size:10px;line-height:1.5;color:var(--text2);background:rgba(255,248,240,.03);border-left:2px solid var(--accent)}
+.drp{border-left-color:#7ab87a;margin-bottom:4px}
+.du .mu,.drp .mu{font-size:9px;color:var(--text3);display:block;margin-bottom:1px}
+.qa{margin-top:8px}
+.qa-i{display:flex;gap:6px}
+.qa-i input{flex:1;background:rgba(255,248,240,.04);border:1px solid var(--border);border-radius:var(--radius-sm);padding:7px 10px;color:var(--text);font-size:11px;outline:none;font-family:var(--font-sans)}
+.qa-i input:focus{border-color:rgba(200,168,120,.3)}
+.qa-m{max-height:350px;overflow-y:auto;margin-bottom:6px}
+.qa-m2{padding:6px 8px;margin-bottom:4px;border-radius:var(--radius-sm);font-size:11px;line-height:1.5}
+.qa-m2.q{background:rgba(200,168,120,.05);border-left:2px solid var(--accent);color:var(--text2)}
+.qa-m2.a{background:rgba(255,248,240,.03);border-left:2px solid #7ab87a;color:var(--text2)}
+.qa-m2 .mu{font-size:9px;color:var(--text3);display:block;margin-bottom:1px}
+.ag{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.ac{border-radius:var(--radius-sm);padding:10px 8px;text-align:center;transition:var(--transition);position:relative;overflow:hidden}
+.ac.un{background:rgba(200,168,120,.04);border:1px solid rgba(200,168,120,.12)}
+.ac.lo{background:rgba(255,248,240,.02);border:1px solid var(--border2);opacity:.4}
+.ac .ai{font-size:24px;margin-bottom:2px;display:block}
+.ac .an{font-size:10px;font-weight:600;color:var(--text);margin-bottom:1px}
+.ac .ad{font-size:8px;color:var(--text3);line-height:1.2}
+.ac .ae{font-size:8px;color:var(--accent);margin-top:2px}
+.ac .sh{position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:conic-gradient(from 0deg,transparent,rgba(255,240,200,.04),transparent 60%);animation:sp 6s linear infinite;pointer-events:none}
+@keyframes sp{to{transform:rotate(360deg)}}
+.je{padding:8px 0;border-bottom:1px solid var(--border2)}
+.je:last-child{border-bottom:none}
+.je .jd{font-size:9px;color:var(--text3);margin-bottom:1px}
+.je .jc{font-size:12px;color:var(--text2);line-height:1.5}
+.je .jx{font-size:9px;color:var(--accent);margin-top:1px}
+.jem{padding:24px;text-align:center;color:var(--text3)}
+.jinput{margin-bottom:10px}
+.jinput textarea{width:100%;background:rgba(255,248,240,.04);border:1px solid var(--border);border-radius:var(--radius-sm);padding:8px 10px;color:var(--text);font-size:12px;outline:none;resize:none;font-family:var(--font-sans);min-height:50px}
+.jinput textarea:focus{border-color:rgba(200,168,120,.25)}
+.jinput .jh{font-size:10px;color:var(--text3);margin-bottom:3px}
+.rec-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(200,168,120,.04);border-radius:var(--radius-sm);margin:6px 0;border:1px dashed rgba(200,168,120,.15)}
+.rec-bar .rec-btn{width:28px;height:28px;border-radius:50%;border:none;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;font-size:12px}
+.rec-bar .rec-btn.rec{background:#e74c3c;color:#fff}
+.rec-bar .rec-btn.rec:hover{background:#c0392b}
+.rec-bar .rec-btn.stop{background:var(--accent);color:var(--bg)}
+.rec-bar .rec-btn.play{background:rgba(200,180,160,.1);color:var(--text2)}
+.rec-bar .rec-btn.del{background:transparent;color:var(--text3)}
+.rec-bar .rec-status{font-size:10px;color:var(--text3);flex:1}
+.rec-bar .rec-time{font-size:10px;color:var(--text2);font-variant-numeric:tabular-nums}
+.modal-over{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:100;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);animation:fd .25s ease}
+.modal-over.show{display:flex}
+@keyframes fd{from{opacity:0}to{opacity:1}}
+.modal{background:#2a221c;border:1px solid var(--border);border-radius:var(--radius);padding:22px;width:90%;max-width:420px;box-shadow:var(--shadow);animation:mi .35s ease;max-height:90vh;overflow-y:auto}
+@keyframes mi{from{opacity:0;transform:scale(.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal h2{font-family:var(--font-serif);font-size:17px;color:var(--text);margin-bottom:10px}
+.modal label{display:block;font-size:10px;color:var(--text3);margin-bottom:2px;font-weight:500}
+.modal input,.modal select,.modal textarea{width:100%;padding:7px 10px;background:rgba(255,248,240,.04);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);font-size:11px;outline:none;margin-bottom:7px;font-family:var(--font-sans)}
+.modal input:focus,.modal select:focus,.modal textarea:focus{border-color:rgba(200,168,120,.3)}
+.modal textarea{min-height:60px;resize:vertical}
+.modal .br{display:flex;gap:8px;margin-top:8px}
+.modal .br .btn{flex:1;justify-content:center}
+.modal .hint{font-size:9px;color:var(--text3);margin-top:-3px;margin-bottom:6px}
+.modal .loading{text-align:center;padding:20px;color:var(--text3);font-size:12px}
+.modal .loading .sp{display:inline-block;width:20px;height:20px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;top:14px;right:14px;z-index:200;background:linear-gradient(135deg,var(--accent),#b8946a);color:var(--bg);border-radius:var(--radius-sm);padding:10px 14px;box-shadow:0 4px 14px rgba(0,0,0,.3);font-size:11px;font-weight:600;transform:translateX(120%);transition:transform .5s cubic-bezier(.34,1.56,.64,1);max-width:240px}
+.toast.show{transform:translateX(0)}
+.xpd{font-size:12px;color:var(--text2);line-height:2}
+.xpd .sp2{margin-top:4px;padding-top:4px;border-top:1px solid var(--border);font-weight:600;color:var(--text)}
+.ia{padding:10px;background:rgba(255,248,240,.02);border:1px dashed var(--border);border-radius:var(--radius-sm);margin-bottom:8px;text-align:center;cursor:pointer;transition:var(--transition)}
+.ia:hover{background:rgba(255,248,240,.05);border-color:rgba(200,168,120,.18)}
+.ia .ii{font-size:24px;margin-bottom:3px;opacity:.5}
+.ia .it{font-size:10px;color:var(--text3)}
+.sp2{font-size:10px;color:var(--text2);padding:5px 8px;background:rgba(200,168,120,.04);border-radius:var(--radius-sm);margin-bottom:5px;display:none}
+.sri{padding:3px 6px;margin:2px 0;border-radius:4px;cursor:pointer;font-size:11px;line-height:1.4;transition:background .2s}
+.sri:hover{background:rgba(200,168,120,.12)}
+.sri b{color:var(--text);font-weight:600}
+@media(max-width:720px){
+  .gt{font-size:20px}.st{grid-template-columns:repeat(3,1fr)}.sc{padding:8px 4px}.sc .n{font-size:17px}
+  .cb{flex-direction:column;align-items:center;text-align:center}.cba2{justify-content:center}
+  .lg{grid-template-columns:repeat(auto-fill,minmax(100px,1fr))}
+  .rch{font-size:18px}.rt{font-size:28px}
+  .cf{gap:2px}.ctg{padding:2px 6px;font-size:8px}
+  .modal{width:95%;padding:14px}
+}
+</style>
+</head>
+<body>
+<canvas id="ambientCanvas"></canvas>
+<div class="app">
+  <header class="header">
+    <div class="logo"><span class="dot"></span>个人读书会</div>
+    <div class="hr">
+      <div class="env"><span id="envI">☀️</span><span id="envT">夏日午后</span></div>
+      <div class="xpb" onclick="togXp()"><span>Lv<span id="lvD">1</span></span><div class="xpbs"><div class="f" id="xpD" style="width:0%"></div></div><span id="xpSD">0</span></div>
+      <button class="stg" onclick="showSet()" title="设置">⚙️</button>
+    </div>
+  </header>
+  <nav class="nav" id="navBar">
+    <button class="nb act" data-p="dash">🏠 首页</button>
+    <button class="nb" data-p="lib">📚 书房</button>
+    <button class="nb" data-p="read">📖 阅读</button>
+    <button class="nb" data-p="ach">🏆 成就 <span class="bd" id="achB">0</span></button>
+    <button class="nb" data-p="club">💬 读书会</button>
+    <button class="nb" data-p="jour">📝 日记</button>
+  </nav>
+  <main class="main">
+    <!-- DASHBOARD -->
+    <div class="pn act" id="p-dash">
+      <div class="gt" id="gt">下午好</div>
+      <div class="gs" id="gs">阳光从窗帘缝隙漏进来。</div>
+      <div class="st">
+        <div class="sc"><div class="n" id="sStr">0</div><div class="l">🔥 连续</div><div class="t" id="sTr"></div></div>
+        <div class="sc"><div class="n" id="sDay">0</div><div class="l">📅 总天数</div></div>
+        <div class="sc"><div class="n" id="sBk">0</div><div class="l">📚 读完</div></div>
+        <div class="sc"><div class="n" id="sPg">0</div><div class="l">📄 页数</div></div>
+        <div class="sc"><div class="n" id="sXp">0</div><div class="l">⭐ 经验</div></div>
+        <div class="sc"><div class="n" id="sLv">1</div><div class="l">🎯 等级</div></div>
+      </div>
+      <div class="ct" id="curBk" style="display:none">
+        <div class="ctt">📖 正在阅读</div>
+        <div class="cb">
+          <div class="cbcv" id="ccCv" style="background:linear-gradient(135deg,#8b6f5c,#6b4f3c)"><span id="ccEm">📘</span><div class="cl" id="ccCl"></div></div>
+          <div class="cbi"><div class="cbt" id="ccT">—</div><div class="cba" id="ccA">—</div><div class="cbc" id="ccB"></div><div class="pb"><div class="f" id="ccPr" style="width:0%"></div></div><div class="pbt"><span id="ccPT">0/0 章</span><span id="ccPP">0%</span></div><div class="cba2"><button class="btn bp bsm" onclick="enterRead()">📖 阅读</button><button class="btn bs bsm" onclick="markDone()">✅ 读完本章</button><button class="btn bs bsm" onclick="showAdd()">📚 换书</button></div></div>
+        </div>
+      </div>
+      <div class="ct" id="noBk">
+        <div class="ctt">📚 欢迎加入读书会</div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px">没有 KPI。只有书、咖啡、和一盏温暖的台灯。</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn bp" onclick="showAdd()">+ 搜索添加</button><button class="btn bs" onclick="showImport()">📥 导入豆瓣</button><button class="btn bs" onclick="showUpload()">📤 上传书目</button></div>
+      </div>
+      <div class="ct" id="xpCard" style="display:none"><div class="ctt">⭐ 经验详情</div><div class="xpd" id="xpB"></div></div>
+    </div>
+
+    <!-- LIBRARY -->
+    <div class="pn" id="p-lib">
+      <div class="lhh">
+        <div style="font-family:var(--font-serif);font-size:17px;font-weight:700;color:var(--text)">📚 书房</div>
+        <div class="la">
+          <input type="text" placeholder="搜索…" id="libS" oninput="renderLib()">
+          <button class="btn bp bsm" onclick="showAdd()">+ 添加</button>
+          <button class="btn bs bsm" onclick="showImport()">📥 豆瓣</button>
+          <button class="btn bs bsm" onclick="showUpload()">📤 上传</button>
+        </div>
+      </div>
+      <div class="cf" id="catF"></div>
+      <div class="lg" id="libG"></div>
+      <div id="selBar" style="display:none;position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--line);padding:8px 12px;z-index:100;gap:8px;align-items:center;box-shadow:0 -2px 8px rgba(0,0,0,.08)">
+        <span id="selCnt" style="font-size:12px;color:var(--text2);margin-right:auto">已选 0 本</span>
+        <button class="btn bs bsm" onclick="selAll()" style="font-size:11px">全选</button>
+        <button class="btn bs bsm" onclick="selNone()" style="font-size:11px">取消</button>
+        <button class="btn bs bsm" onclick="batchDone()" style="color:var(--accent)">✅ 标为已读</button>
+        <button class="btn bs bsm" onclick="batchCat()">🏷️ 改分类</button>
+        <button class="btn bs bsm" onclick="if(confirm('确定删除 '+_selIds.size+' 本书？'))batchDel()" style="color:#e74c3c">🗑️ 删除</button>
+      </div>
+    </div>
+
+    <!-- READING -->
+    <div class="pn" id="p-read">
+      <div class="ct" id="readAct" style="display:none">
+        <div class="rh"><button class="btn bs bsm" onclick="sw('dash')">← 返回</button><button class="btn bs bsm" onclick="showUpload()">📤 上传</button></div>
+        <div class="rs" id="rSc">📖 温暖的灯光下</div>
+        <div class="rch" id="rCh">第 1 章</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:4px" id="rBk">—</div>
+        <div class="pb"><div class="f" id="rPr" style="width:0%"></div></div>
+        <div class="pbt"><span id="rPT">0/0 章</span></div>
+        <div class="rt" id="rTim">00:00<span class="u">本次阅读</span></div>
+        <div class="ra">
+          <button class="btn bp" id="rStart" onclick="togRead()">▶ 开始计时</button>
+          <button class="btn bs" onclick="markDone()">✅ 读完本章</button>
+          <button class="btn bs" onclick="openDraw()">🎲 抽领读员</button>
+        </div>
+        <div class="ls" id="ldrSec">
+          <div class="lh">
+            <div class="lav" id="lAv" style="background:#666">?</div>
+            <div class="li"><div class="ln" id="lN">等待抽选</div><div class="ls2" id="lS">点击按钮抽选</div></div>
+            <div class="lbg w" id="lBg">待抽选</div>
+          </div>
+          <div id="lCont"></div>
+          <div class="rec-bar" id="recBar" style="display:none">
+            <button class="rec-btn rec" id="recBtn" onclick="togRecord()">🔴</button>
+            <span class="rec-status" id="recStatus">点击开始录音</span>
+            <span class="rec-time" id="recTime">00:00</span>
+            <button class="rec-btn play" id="playBtn" onclick="playRecord()" style="display:none">▶</button>
+            <button class="rec-btn del" id="delBtn" onclick="delRecord()" style="display:none">✕</button>
+          </div>
+        </div>
+      </div>
+      <div class="ct" id="readEm"><div style="text-align:center;padding:36px 16px"><div style="font-size:38px;margin-bottom:10px;opacity:.3">📖</div><p style="font-size:13px;color:var(--text3);margin-bottom:10px">还没有开始阅读。</p><button class="btn bp" onclick="sw('lib')">去书房</button></div></div>
+    </div>
+
+    <!-- ACHIEVEMENTS -->
+    <div class="pn" id="p-ach">
+      <div style="font-family:var(--font-serif);font-size:17px;font-weight:700;color:var(--text);margin-bottom:2px">🏆 成就</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">已解锁 <span id="achU">0</span> / <span id="achT">0</span></div>
+      <div class="ag" id="achG"></div>
+    </div>
+
+    <!-- CLUB -->
+    <div class="pn" id="p-club">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px;margin-bottom:2px">
+        <div style="font-family:var(--font-serif);font-size:17px;font-weight:700;color:var(--text)">💬 读书会</div>
+        <button class="btn bs bsm" onclick="sw('read')">📖 去阅读</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">成员已就位，开始你们的讨论吧</div>
+      <div class="ct"><div class="ctt">👥 本次成员 (<span id="mCount">0</span>人)</div><div class="cm" id="clubM"></div></div>
+      <div class="ct"><div class="ctt">🎙️ 领读时刻</div><div id="clubLdr"></div></div>
+      <div class="ct"><div class="ctt">💬 讨论与记录</div><div id="clubD"></div></div>
+      <div class="ct"><div class="ctt">🤖 向领读员提问</div><div id="qaBox"></div></div>
+      <div class="ct"><div class="ctt">🎮 挑战</div><div id="chall" style="font-size:12px;color:var(--text2);line-height:1.5"></div></div>
+    </div>
+
+    <!-- JOURNAL -->
+    <div class="pn" id="p-jour">
+      <div style="font-family:var(--font-serif);font-size:17px;font-weight:700;color:var(--text);margin-bottom:2px">📝 阅读日记</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:10px">记录你的阅读感悟</div>
+      <div class="ct">
+        <div class="jinput"><div class="jh">✏️ 写下今天的想法</div><textarea id="jourInput" placeholder="读完这一章，你有什么想说的？可以是对内容的感想，也可以是和自己的连接…"></textarea><button class="btn bp bsm" onclick="saveJournal()" style="margin-top:4px">保存</button></div>
+      </div>
+      <div class="ct"><div id="jEntries"></div><div class="jem" id="jEm">还没有记录</div></div>
+    </div>
+  </main>
+</div>
+
+<!-- ADD BOOK MODAL -->
+<div class="modal-over" id="addM"><div class="modal">
+  <h2>📚 添加一本书</h2>
+  <label>书名</label>
+  <input type="text" id="inpT" placeholder="输入书名，自动搜索…" oninput="debSearch()">
+  <div class="sp2" id="searchP"></div>
+  <label>作者</label><input type="text" id="inpA" placeholder="自动填充">
+  <label>豆瓣分类</label><select id="inpC"></select>
+  <label>总章节数</label><input type="number" id="inpCh" value="10" min="1" max="500">
+  <div class="hint">💡 输入书名后自动搜索分类和章节数</div>
+  <div class="br"><button class="btn bp" onclick="addBook()">添加</button><button class="btn bs" onclick="hideAdd()">取消</button></div>
+</div></div>
+
+<!-- IMPORT DOUBAN MODAL -->
+<div class="modal-over" id="importM"><div class="modal">
+  <h2>📥 导入豆瓣读书记录</h2>
+
+  <div style="background:rgba(122,184,122,.08);border:1px solid rgba(122,184,122,.15);border-radius:10px;padding:10px 12px;margin-bottom:10px">
+    <div style="font-size:12px;font-weight:600;color:#7ab87a;margin-bottom:4px">✅ 推荐方法：粘贴文本</div>
+    <div style="font-size:10px;color:var(--text2);line-height:1.7">
+      1. 打开 <a href="https://book.douban.com/mine" target="_blank" style="color:var(--accent)">book.douban.com/mine</a> → 点击「<b>读书</b>」→「<b>已读</b>」<br>
+      2. 在页面任意位置按 <b>⌘+A</b> 全选，再按 <b>⌘+C</b> 复制<br>
+      3. 粘贴到下方文本框，点击导入
+    </div>
+  </div>
+
+  <textarea id="importT" placeholder="粘贴从豆瓣复制的已读书目&#10;&#10;复制后效果示例：&#10;三体  刘慈欣 / 重庆出版社 / 2008 / 23.00元&#10;活着  余华 / 作家出版社 / 2012 / 20.00元&#10;百年孤独  加西亚·马尔克斯 / 南海出版公司 / 2011 / 39.50元" style="min-height:100px"></textarea>
+
+  <div id="importLoading" style="display:none;text-align:center;padding:10px;color:var(--text3);font-size:12px"><div class="sp" style="display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:6px"></div><br>正在导入…</div>
+
+  <details style="margin:6px 0;font-size:10px;color:var(--text3)">
+    <summary style="cursor:pointer">URL 导入（不稳定，需 API Key）</summary>
+    <div style="margin-top:6px;line-height:1.6">
+      输入豆瓣读书主页 URL，通过 API 解析（豆瓣反爬严，可能失败）：<br>
+      <input type="text" id="doubanUrl" placeholder="https://book.douban.com/people/你的用户名/collect" style="margin-top:4px">
+    </div>
+  </details>
+
+  <div class="br"><button class="btn bp" onclick="importDouban()">导入</button><button class="btn bs" onclick="hideImport()">取消</button></div>
+</div></div>
+
+<!-- UPLOAD MODAL -->
+<div class="modal-over" id="uploadM"><div class="modal">
+  <h2>📤 上传书目</h2>
+  <div style="font-size:11px;color:var(--text3);margin-bottom:6px">上传 TXT/MD 文件</div>
+  <div class="ia"><input type="file" id="fileInput" accept=".txt,.md" style="display:none" onchange="handleFile(this)"><div class="ii">📄</div><div class="it" onclick="document.getElementById('fileInput').click()">点击选择文件</div></div>
+  <div id="uploadP" style="display:none;font-size:11px;color:var(--text2);padding:6px 0"></div>
+  <label>书名</label><input type="text" id="upT" placeholder="自动识别">
+  <label>作者</label><input type="text" id="upA" placeholder="可选">
+  <div class="br"><button class="btn bp" onclick="uploadBook()">添加到书房</button><button class="btn bs" onclick="hideUpload()">取消</button></div>
+</div></div>
+
+<!-- DRAW MODAL -->
+<div class="modal-over" id="drawM"><div class="modal" style="text-align:center">
+  <h2>🎲 抽选领读员</h2>
+  <div id="drawC" style="padding:10px 0"></div>
+  <div class="br"><button class="btn bp" onclick="execDraw()" id="drawBtn">🎲 开始抽选</button><button class="btn bs" onclick="closeDraw()">取消</button></div>
+</div></div>
+
+<!-- EDIT BOOK MODAL -->
+<div class="modal-over" id="editM"><div class="modal">
+  <h2>✏️ 编辑书籍</h2>
+  <label>书名</label><input type="text" id="edT">
+  <label>作者</label><input type="text" id="edA">
+  <label>分类</label><select id="edC"></select>
+  <label>总章节数</label><input type="number" id="edCh" min="1" max="500">
+  <label>当前进度（第几章）</label><input type="number" id="edCur" min="0" max="500">
+  <div class="hint" id="edHint"></div>
+  <div class="br">
+    <button class="btn bp" onclick="saveEdit()">💾 保存</button>
+    <button class="btn bs" onclick="hideEdit()">取消</button>
+    <button class="btn bs" onclick="deleteBook()" style="color:#e74c3c;border-color:rgba(231,76,60,.3)">🗑️ 删除</button>
+  </div>
+</div></div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal-over" id="setM"><div class="modal">
+  <h2>⚙️ 设置</h2>
+  <label>DeepSeek API Key</label>
+  <input type="password" id="dsKey" placeholder="sk-...">
+  <div class="hint">配置后自动搜索图书、导入豆瓣、读书会问答。<a href="https://platform.deepseek.com" target="_blank" style="color:var(--accent)">platform.deepseek.com</a> 免费注册获取</div>
+  <label>场景氛围</label>
+  <select id="scenePref"><option value="auto">🌍 自动</option><option value="fire">🔥 壁炉</option><option value="rain">🌧️ 雨景</option><option value="snow">❄️ 雪景</option></select>
+  <div class="br"><button class="btn bp" onclick="saveSet()">保存</button><button class="btn bs" onclick="hideSet()">取消</button></div>
+</div></div>
+
+<script>
+const KEY='bc4',DSK='bc_ds_key',SCENEK='bc_scene';
+const CAT={文学:{e:'📖',c:'#c0392b'},社科:{e:'📊',c:'#2980b9'},科幻:{e:'🚀',c:'#8e44ad'},悬疑:{e:'🔍',c:'#922b21'},历史:{e:'📜',c:'#a0522d'},哲学:{e:'💭',c:'#b8860b'},心理:{e:'🧠',c:'#27ae60'},商业:{e:'📈',c:'#1a5276'},艺术:{e:'🎨',c:'#c2185b'},生活:{e:'☕',c:'#e67e22'},教育:{e:'🎓',c:'#16a085'},科技:{e:'💻',c:'#2c3e50'},漫画:{e:'💬',c:'#d4a017'},随笔:{e:'✍️',c:'#7f8c8d'},诗歌:{e:'🌸',c:'#b06d8e'}};
+const LVLS=[{n:'书虫',x:0},{n:'爱书人',x:200},{n:'阅读者',x:500},{n:'博览群书',x:1000},{n:'文学爱好者',x:1800},{n:'书评家',x:2800},{n:'藏书家',x:4000},{n:'鉴赏家',x:5500},{n:'大师',x:7500},{n:'贤者',x:10000}];
+const ACH=[
+  {id:'fb',n:'初次阅读',i:'📖',ck:x=>x.finishedBooks>=1,x:50},{id:'f3',n:'百花齐放',i:'🌸',ck:x=>x.finishedBooks>=3,x:60},
+  {id:'f5',n:'书不离手',i:'📚',ck:x=>x.finishedBooks>=5,x:100},{id:'f10',n:'藏书家',i:'📚',ck:x=>x.finishedBooks>=10,x:200},
+  {id:'s3',n:'初露锋芒',i:'🔥',ck:x=>x.streak>=3,x:30},{id:'s7',n:'专注者',i:'🔥',ck:x=>x.streak>=7,x:80},
+  {id:'s14',n:'坚持者',i:'🔥',ck:x=>x.streak>=14,x:150},{id:'s30',n:'勇士',i:'🔥',ck:x=>x.streak>=30,x:300},
+  {id:'p100',n:'百页',i:'📄',ck:x=>x.totalPages>=100,x:40},{id:'p500',n:'五百页',i:'📄',ck:x=>x.totalPages>=500,x:100},
+  {id:'fc',n:'起步',i:'📖',ck:x=>x.totalChapters>=1,x:20},{id:'night',n:'夜猫子',i:'🦉',ck:x=>x.nightS>=1,x:30},
+  {id:'early',n:'早起虫',i:'🐛',ck:x=>x.morningS>=1,x:30},{id:'xp1',n:'经验猎手',i:'⭐',ck:x=>x.totalXp>=1000,x:100},
+  {id:'xp5',n:'经验大师',i:'⭐',ck:x=>x.totalXp>=5000,x:300},{id:'rec',n:'领读者',i:'🎤',ck:x=>x.recCount>=1,x:40},
+  {id:'qa',n:'求知者',i:'🤔',ck:x=>x.qaCount>=5,x:50},
+];
+const DUSERS=[
+  {n:'老陈',s:'退休教师',c:'#8b6f5c',d:'喜欢从教育视角看书，说话像在课堂上'},
+  {n:'小林',s:'程序员',c:'#5b8f7c',d:'爱读科幻和推理，总想拆解作者的逻辑'},
+  {n:'阿花',s:'花店老板',c:'#c28ea0',d:'喜欢诗歌和散文，容易被文字打动'},
+  {n:'大刘',s:'外卖骑手',c:'#7f6b8f',d:'送餐间隙看书，最爱历史和社会学'},
+  {n:'小鹿',s:'心理咨询师',c:'#6f8f7f',d:'从心理学角度拆解人物和情节'},
+  {n:'老赵',s:'退休记者',c:'#5f7f8f',d:'关注非虚构和纪实，提问总是一针见血'},
+  {n:'阿卷',s:'插画师',c:'#7faf8f',d:'用画画的方式理解书，视角很独特'},
+  {n:'小白',s:'医学生',c:'#5f6f8f',d:'读什么都能联系到解剖学和脑科学'},
+  {n:'三水',s:'咖啡师',c:'#8f7f6f',d:'一边冲咖啡一边听大家聊书，偶尔冒出一句神总结'},
+  {n:'虾饺',s:'中学语文老师',c:'#7fbfaf',d:'什么书都能找到可以教学生的切入点'},
+  {n:'摩卡',s:'自由摄影师',c:'#9f8f7f',d:'用影像思维读书，关注画面感和构图'},
+  {n:'老K',s:'退伍军人',c:'#5f5f5f',d:'喜欢传记和历史，说话直来直去'},
+  {n:'鱼片',s:'新媒体运营',c:'#7f5f5f',d:'擅长抓重点和金句，做笔记一流'},
+  {n:'苏打',s:'调酒师',c:'#8f7f8f',d:'深夜读书族，品味很独特'},
+  {n:'阿树',s:'植物学博士',c:'#6f5f4f',d:'关注自然科学和环保，视野很广阔'},
+  {n:'小满',s:'钢琴老师',c:'#b06d8e',d:'用节奏和旋律来感受文字的韵律'},
+];
+
+</script>
+<script>
+function D(){return{books:[],cur:[],curCh:0,streak:0,totalDays:0,finishedBooks:0,totalPages:0,totalChapters:0,totalXp:0,level:1,xpProg:0,xpR:0,xpA:0,xpS:0,nightS:0,morningS:0,recCount:0,qaCount:0,lastRead:null,unlocked:[],journal:[],ldrData:{},qaHist:[],recordings:{},discussHist:[],discussQ:null}}
+function load(){try{let r=localStorage.getItem(KEY);const d=r?{...D(),...JSON.parse(r)}:D();if(typeof d.cur==='string')d.cur=d.cur?[d.cur]:[];return d}catch(e){return D()}}
+function save(d){localStorage.setItem(KEY,JSON.stringify(d));return d}
+function dsk(){return localStorage.getItem(DSK)||''}
+function scPref(){return localStorage.getItem(SCENEK)||'auto'}
+function sr(s){let h=0;for(let i=0;i<s.length;i++){h=((h<<5)-h)+s.charCodeAt(i);h|=0}return function(){h=h+1|0;let t=Math.sin(h)*43758.5453;return t-Math.floor(t)}}
+function getMembers(t){const r=sr('bc_'+t);return[...DUSERS].sort(()=>r()-0.5).slice(0,5+Math.floor(r()*3))}
+
+function env(){
+  const n=new Date(),m=n.getMonth(),h=n.getHours();
+  const sea=['spring','summer','autumn','winter'][m<2?3:m<5?0:m<8?1:2];
+  const ti=h<5?'night':h<7?'dawn':h<11?'morning':h<14?'afternoon':h<17?'afternoon':h<19?'sunset':h<22?'evening':'night';
+  const tn={dawn:'黎明',morning:'上午',afternoon:'午后',sunset:'黄昏',evening:'傍晚',night:'深夜'};
+  const sn={spring:'春日',summer:'夏日',autumn:'秋日',winter:'冬日'};
+  const ic={dawn:'🌅',morning:'☀️',afternoon:'🌤',sunset:'🌇',evening:'🌆',night:'🌙'};
+  const gr={dawn:'清晨好',morning:'上午好',afternoon:'下午好',sunset:'黄昏好',evening:'晚上好',night:'夜深了'};
+  const sb={dawn:'窗外天色渐明。',morning:'阳光从窗帘缝隙漏进来。',afternoon:'午后慵懒的时光。',sunset:'光线变得温暖。',evening:'你的读书时间到了。',night:'全世界都安静了。'};
+  return{sea,ti,sn:sn[sea],tn:tn[ti],ic:ic[ti],gr:gr[ti],sb:sb[ti],hour:h};
+}
+
+function apply(){
+  const e=env();document.body.className=e.sea;
+  document.getElementById('envI').textContent=e.ic;
+  document.getElementById('envT').textContent=e.sn+e.tn;
+  document.getElementById('gt').textContent=e.gr+' '+e.ic;
+  document.getElementById('gs').textContent=e.sb;
+  return e;
+}
+
+function lv(xp){let l=1;for(let i=LVLS.length-1;i>=0;i--)if(xp>=LVLS[i].x){l=i+1;break}
+  const c=LVLS[Math.min(l-1,LVLS.length-1)],n=LVLS[Math.min(l,LVLS.length-1)];
+  return{lv:l,pct:n?((xp-c.x)/(n.x-c.x)*100):100,nm:c.n}}
+
+function addXp(d,am,src='r'){d.totalXp+=am;if(src==='r')d.xpR+=am;else if(src==='a')d.xpA+=am;else d.xpS+=am;const l=lv(d.totalXp);if(l.lv>d.level){d.level=l.lv;toast('🎉 Lv.'+l.lv+'「'+l.nm+'」')}return l}
+function sb(d){return d.streak>=30?10:d.streak>=14?5:d.streak>=7?3:d.streak>=3?1:0}
+
+function toast(m){let e=document.getElementById('t');if(!e){e=document.createElement('div');e.id='t';e.className='toast';document.body.appendChild(e)}e.textContent=m;e.classList.add('show');clearTimeout(e._h);e._h=setTimeout(()=>e.classList.remove('show'),2800)}
+
+// ====== BOOK SEARCH ======
+let st=null,_sr=null;
+function debSearch(){clearTimeout(st);st=setTimeout(doSearch,500)}
+function selectResult(idx){
+  const b=_sr&&_sr[idx];if(!b)return;
+  document.getElementById('inpA').value=b.author;
+  const sel=document.getElementById('inpC');
+  for(let i=0;i<sel.options.length;i++)if(sel.options[i].value===b.cat){sel.selectedIndex=i;break}
+  document.getElementById('inpCh').value=b.ch;
+  document.getElementById('searchP').innerHTML='✅ <strong>'+b.title+'</strong> '+b.author+' · '+b.cat+' · ~'+b.ch+'章';
+}
+function catFromSubs(subs){
+  const m={'科幻':['science fiction','科幻'],'历史':['history','历史'],'哲学':['philosophy','哲学'],'心理':['psychology','mental','心理'],'悬疑':['mystery','thrill','悬疑'],'社科':['sociology','social','社会科学'],'商业':['business','economic','商业'],'艺术':['art','艺术'],'教育':['education','教育'],'科技':['technology','computer','科技'],'漫画':['comic','graphic novel','漫画'],'诗歌':['poetry','诗歌'],'随笔':['essay','随笔'],'生活':['cooking','travel','生活']};
+  for(const s of subs||[]){const sl=s.toLowerCase();for(const[k,v]of Object.entries(m)){if(v.some(x=>sl.includes(x)))return k}}return'文学'
+}
+async function doSearch(){
+  const q=document.getElementById('inpT').value.trim();
+  const p=document.getElementById('searchP');
+  if(!q||q.length<2){p.style.display='none';return}
+  p.style.display='block';p.innerHTML='🔍 正在搜索…';
+  const key=dsk();_sr=null;
+  // Try OpenLibrary
+  const ac=new AbortController();const tid=setTimeout(()=>ac.abort(),4000);
+  try{
+    const r=await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&limit=5`,{signal:ac.signal});
+    clearTimeout(tid);
+    if(r.ok){const d=await r.json();
+      if(d.docs&&d.docs.length>0){
+        _sr=d.docs.slice(0,5).map(b=>({title:b.title||q,author:b.author_name?b.author_name[0]:'',cat:catFromSubs(b.subject),ch:b.number_of_pages_median?Math.max(3,Math.round(b.number_of_pages_median/25)):10}));
+        p.innerHTML=_sr.map((b,i)=>'<div class="sri" onclick="selectResult('+i+')"><b>'+b.title+'</b> <span style="color:var(--text3)">'+b.author+' · '+b.cat+' · ~'+b.ch+'章</span></div>').join('')
+          +'<div style="font-size:9px;color:var(--text3);margin-top:4px">点击选择搜索结果</div>';
+        return
+      }
+    }
+  }catch(e){clearTimeout(tid)}
+  // Try DeepSeek API
+  if(key){
+    p.innerHTML='🔍 正在通过 DeepSeek 搜索…';
+    try{
+      const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{
+        method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+        body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:'根据书名返回作者、分类和章节数。分类：文学/社科/科幻/悬疑/历史/哲学/心理/商业/艺术/生活/教育/科技/漫画/随笔/诗歌。JSON:{"author":"","cat":"","ch":数字}'},{role:'user',content:'《'+q+'》'}],stream:false})
+      });
+      const data=await resp.json();
+      if(data.choices){
+        const c=data.choices[0].message.content;
+        try{
+          const j=JSON.parse(c);
+          if(j&&j.author){
+            _sr=[{title:q,author:j.author,cat:j.cat||'文学',ch:j.ch||10}];
+            selectResult(0);
+            return
+          }
+        }catch(e){}
+      }
+    }catch(e2){}
+  }
+  p.innerHTML=(key?'⚠️ 未找到，请手动填写':'<span style="color:var(--accent)">💡 在设置中配置 DeepSeek API Key 可自动搜索</span><br>⚠️ 或手动填写信息后点击添加');
+}
+
+// ====== ADD ======
+function popCats(){const sel=document.getElementById('inpC');sel.innerHTML=Object.keys(CAT).map(k=>'<option value="'+k+'">'+CAT[k].e+' '+k+'</option>').join('')}
+function showAdd(){document.getElementById('addM').classList.add('show')}
+function hideAdd(){document.getElementById('addM').classList.remove('show')}
+function addBook(){
+  const t=document.getElementById('inpT').value.trim();if(!t){toast('请输入书名');return}
+  const a=document.getElementById('inpA').value.trim()||'未知作者',c=document.getElementById('inpC').value,ch=parseInt(document.getElementById('inpCh').value)||10;
+  let d=load();d.books.push({id:Date.now().toString(36),title:t,author:a,category:c,chapters:ch,curCh:0,done:false,created:new Date().toISOString()});
+  if(!d.cur.length){d.cur=[d.books[d.books.length-1].id];d.curCh=0}
+  save(d);hideAdd();document.getElementById('inpT').value='';document.getElementById('inpA').value='';renderAll();toast('📚 《'+t+'》已加入');
+}
+
+// ====== IMPORT DOUBAN ======
+function showImport(){document.getElementById('importM').classList.add('show')}
+function hideImport(){document.getElementById('importM').classList.remove('show')}
+
+async function importDouban(){
+  const url=document.getElementById('doubanUrl').value.trim();
+  const text=document.getElementById('importT').value.trim();
+  let d=load(),count=0;
+  const key=dsk();
+
+  if(url){
+    document.getElementById('importLoading').style.display='block';
+    // Try CORS proxies first
+    const proxies=[
+      u=>'https://corsproxy.io/?'+encodeURIComponent(u),
+      u=>'https://api.allorigins.win/raw?url='+encodeURIComponent(u),
+      u=>'https://api.codetabs.com/v1/proxy?quest='+encodeURIComponent(u),
+      u=>'https://r.jina.ai/http://'+u.replace(/^https?:\/\//,'')
+    ];
+    let html='';
+    for(const proxy of proxies){
+      try{
+        document.getElementById('importLoading').innerHTML='<div class="sp" style="display:inline-block;width:18px;height:18px;border:2px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin-bottom:6px"></div><br>正在连接豆瓣…';
+        const r=await fetch(proxy(url),{signal:AbortSignal.timeout(10000)});
+        if(r.ok){html=await r.text();break}
+      }catch(e){continue}
+    }
+    // If proxies all fail, try DeepSeek API
+    if(!html&&key){
+      document.getElementById('importLoading').innerHTML='<br>正在通过 DeepSeek 解析…';
+      try{
+        const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{
+          method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+          body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:'你熟悉豆瓣读书页面 https://book.douban.com/people/*/collect 的HTML结构。根据用户提供的URL，提取该页面列出的所有已读书籍信息。每个页面一般有15条。返回格式：每行《书名》作者·分类。分类从以下选：文学/社科/科幻/悬疑/历史/哲学/心理/商业/艺术/生活/教育/科技/漫画/随笔/诗歌。如不确定分类默认文学。'},{role:'user',content:'请解析：'+url}],stream:false})
+        });
+        const data=await resp.json();
+        if(data.choices){const c=data.choices[0].message.content;
+          const lines=c.split('\n').filter(l=>l.trim());
+          for(const line of lines){
+            let m=line.match(/《(.+?)》\s*(.+?)·\s*(.+)$/)||line.match(/《(.+?)》\s*(.+)/);
+            if(m){const t=m[1].trim(),a=m[2]?m[2].trim().replace(/[·•].*/,'').trim():'豆瓣导入',cat=m[3]?m[3].trim():'文学';
+              d.books.push({id:Date.now().toString(36)+count,title:t,author:a,category:Object.keys(CAT).includes(cat)?cat:'文学',chapters:10,curCh:0,done:true,created:new Date().toISOString()});count++}
+          }
+        }
+      }catch(e){}
+    }
+    // Parse HTML if we got it from proxy
+    if(html&&count===0){
+      const parser=new DOMParser();
+      const doc=parser.parseFromString(html,'text/html');
+      const items=doc.querySelectorAll('.subject-item');
+      items.forEach(el=>{
+        const titleEl=el.querySelector('.title a');
+        if(!titleEl)return;
+        const title=titleEl.getAttribute('title')||titleEl.textContent.trim().replace(/\s+/g,' ');
+        if(!title||title.length<1)return;
+        const pub=el.querySelector('.pub');
+        let author='豆瓣导入';
+        if(pub){const txt=pub.textContent.trim();const m=txt.match(/^\s*(.+?)\s*\/\s*/);if(m)author=m[1].trim().replace(/\s+/g,'')}
+        d.books.push({id:Date.now().toString(36)+count,title:title,author:author,category:'文学',chapters:10,curCh:0,done:true,created:new Date().toISOString()});count++
+      });
+      if(count===0&&html.length>0){const m2=html.matchAll(/title="([^"]+)"[\s\S]{0,200}?class="pub"[\s\S]{0,200}?([^<]+)/g);for(const m of m2){if(m[1].length>1&&m[1].length<100&&!/^\s*$/.test(m[1])&&!/douban|book|home/i.test(m[1])){d.books.push({id:Date.now().toString(36)+count,title:m[1].trim(),author:(m[2]||'豆瓣导入').trim().split('/')[0].trim(),category:'文学',chapters:10,curCh:0,done:true,created:new Date().toISOString()});count++}}}
+    }
+    document.getElementById('importLoading').style.display='none';
+    if(count===0){toast('无法获取豆瓣数据，请使用下方文本粘贴方式导入');return}
+  } else if(text){
+    const lines=text.split('\n').filter(l=>l.trim());
+    for(const line of lines){
+      let m,t,a;
+      // 书名  作者 / 出版社 / year / price  (豆瓣复制标准格式)
+      m=line.match(/^(.+?)\s{2,}(.+?)\s*\/\s/);
+      if(m){t=m[1].trim();a=m[2].trim();}
+      // 《书名》作者·分类
+      if(!t){m=line.match(/《(.+?)》\s*(.+?)·\s*(.+)$/);if(m){t=m[1].trim();a=m[2].trim()}}
+      // 《书名》作者
+      if(!t){m=line.match(/《(.+?)》\s*(.+)$/);if(m){t=m[1].trim();a=m[2].trim()}}
+      // 书名  作者 (2-4中文)
+      if(!t){m=line.match(/^(.+?)\s+([\u4e00-\u9fff]{2,4})$/);if(m){t=m[1].trim();a=m[2].trim()}}
+      if(t){
+        a=a.replace(/[·•].*/,'').trim()||'豆瓣导入';
+        d.books.push({id:Date.now().toString(36)+count,title:t,author:a,category:'文学',chapters:10,curCh:0,done:true,created:new Date().toISOString()});count++
+      }else{
+        const clean=line.replace(/^[\s\d.、-]+/,'').trim();
+        if(clean.length>1&&!/^(小说|作者|出版社|ISBN|评分|标签|日期|来自|首页|豆瓣)/i.test(clean)){d.books.push({id:Date.now().toString(36)+count,title:clean,author:'豆瓣导入',category:'文学',chapters:10,curCh:0,done:true,created:new Date().toISOString()});count++}
+      }
+    }
+  } else {toast('请填写URL或粘贴文本');return}
+
+    if(count>0){d.finishedBooks+=count;if(!d.cur.length){const b=d.books.find(x=>!x.done);if(b){d.cur=[b.id]}}save(d);renderAll();hideImport();document.getElementById('doubanUrl').value='';document.getElementById('importT').value='';toast('📥 导入 '+count+' 本书（已标记为读过）')}
+  else{toast('没有识别到有效记录')}
+}
+
+// ====== UPLOAD ======
+let upC='',upN='';
+function showUpload(){document.getElementById('uploadM').classList.add('show')}
+function hideUpload(){document.getElementById('uploadM').classList.remove('show');upC='';upN=''}
+function handleFile(i){const f=i.files[0];if(!f)return;upN=f.name.replace(/\.(txt|md)$/i,'');
+  const r=new FileReader();r.onload=function(e){upC=e.target.result;document.getElementById('uploadP').style.display='block';document.getElementById('uploadP').innerHTML='📄 '+f.name+' ('+(f.size/1024).toFixed(1)+'KB)';document.getElementById('upT').value=upN};r.readAsText(f,'UTF-8')}
+function uploadBook(){const t=document.getElementById('upT').value.trim()||upN||'未命名',a=document.getElementById('upA').value.trim()||'上传者';
+  if(!upC){toast('请选择文件');return}
+  let d=load();d.books.push({id:Date.now().toString(36),title:t,author:a,category:'文学',chapters:Math.max(1,Math.ceil(upC.length/3000)),curCh:0,done:false,created:new Date().toISOString(),content:upC.substring(0,50000)});
+  if(!d.cur.length){d.cur=[d.books[d.books.length-1].id]}
+  save(d);hideUpload();document.getElementById('upT').value='';document.getElementById('upA').value='';upC='';renderAll();toast('📤 已上传'+t)}
+// ====== READING ======
+let rTimer=null,rSec=0,rOn=false;
+function enterRead(){const d=load();if(!d.cur.length){sw('lib');return}
+  document.getElementById('readAct').style.display='block';document.getElementById('readEm').style.display='none';
+  const b=d.books.find(x=>x.id===d.cur[0]);if(!b){document.getElementById('readAct').style.display='none';document.getElementById('readEm').style.display='block';return}
+  const e=env();const sn={dawn:'黎明的微光',morning:'阳光洒在书页上',afternoon:'午后时光',sunset:'黄昏的光线',evening:'台灯亮起来了',night:'深夜，全世界都睡了'};
+  document.getElementById('rSc').textContent='📖 '+(sn[e.ti]||'温暖的灯光下');document.getElementById('rBk').textContent='《'+b.title+'》';renderRS();renderLdr(d,b)}
+function renderRS(){const d=load(),b=d.books.find(x=>x.id===d.cur[0]);if(!b)return;const ch=b.curCh||0;document.getElementById('rCh').textContent='第 '+(ch+1)+' 章';document.getElementById('rPr').style.width=(ch/b.chapters*100)+'%';document.getElementById('rPT').textContent=ch+'/'+b.chapters+' 章'}
+function togRead(){const btn=document.getElementById('rStart');if(rOn){stopR();btn.innerHTML='▶ 开始';btn.className='btn bp'}else{startR();btn.innerHTML='⏸ 暂停';btn.className='btn bs'}rOn=!rOn}
+function startR(){if(rTimer)clearInterval(rTimer);rTimer=setInterval(()=>{rSec++;const m=String(Math.floor(rSec/60)).padStart(2,'0'),s=String(rSec%60).padStart(2,'0');document.getElementById('rTim').innerHTML=m+':'+s+'<span class="u">本次阅读</span>'},1000)}
+function stopR(){if(rTimer){clearInterval(rTimer);rTimer=null}}
+function markDone(){let d=load();const b=d.books.find(x=>x.id===d.cur[0]);if(!b){toast('还没有读书');return}const ch=b.curCh||0;if(ch>=b.chapters){toast('🎉 已读完！');return}
+  stopR();rOn=false;document.getElementById('rStart').innerHTML='▶ 开始';document.getElementById('rStart').className='btn bp';
+  const e=env();if(e.ti==='night')d.nightS++;if(e.ti==='dawn'||e.ti==='morning')d.morningS++;
+  const base=20,streakB=sb(d),tb=Math.min(20,Math.floor(rSec/60));const xp=base+streakB+tb;
+  b.curCh=ch+1;d.totalChapters++;d.totalPages+=5+Math.floor(Math.random()*10);
+  const today=new Date().toDateString();if(d.lastRead!==today){const y=new Date(Date.now()-86400000).toDateString();if(d.lastRead===y)d.streak++;else d.streak=1;d.lastRead=today;d.totalDays++}
+  addXp(d,xp,'r');if(streakB>0)addXp(d,streakB,'s');
+  if(b.curCh>=b.chapters){b.done=true;d.finishedBooks++;d.cur=d.cur.filter(id=>id!==b.id);if(!d.cur.length)d.cur=[d.books.find(x=>!x.done)?.id].filter(Boolean)}
+  checkAch(d);const l=lv(d.totalXp);d.level=l.lv;d.xpProg=l.pct;
+  d.journal.push({date:today,book:b.title,chapter:ch+1,xp:xp,time:rSec,timeOfDay:e.ti});
+  save(d);renderAll();rSec=0;document.getElementById('rTim').innerHTML='00:00<span class="u">本次阅读</span>';
+  toast('📖 读完第'+(ch+1)+'章 +'+xp+' XP'+(streakB>0?' 🔥+'+streakB:''));
+  if(b.curCh>=b.chapters){renderAll();enterRead()}else{renderRS();renderLdr(d,b)}}
+
+// ====== LEADER ======
+async function fetchBookContent(b,category){
+  if(!b||!b.title)return null;
+  const key=dsk();
+  if(!key)return null;
+  try{
+    const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({
+        model:'deepseek-chat',
+        messages:[
+          {role:'system',content:'搜索关于"' + b.title + '"这本书的真实内容。找一段书中原文或公认的核心段落（100字以内），以及作者的背景或书的核心思想（50字以内）。直接返回JSON：{"passage":"原文","source":"章节","thought":"思想解读"}'},
+          {role:'user',content:'请搜索关于《'+b.title+'》的内容'}
+        ],stream:false
+      })
+    });
+    const data=await resp.json();
+    if(data.choices&&data.choices[0].message.content){
+      try{return JSON.parse(data.choices[0].message.content)}catch(e){return {t:data.choices[0].message.content,b:'《'+b.title+'》',h:'来自网络搜索'}}
+    }
+  }catch(e){}
+  return null;
+}
+const bookContentCache={};
+async function ensureBookContent(b){
+  if(!b)return null;
+  if(bookContentCache[b.id])return bookContentCache[b.id];
+  const c=await fetchBookContent(b);
+  if(c){bookContentCache[b.id]=c;return c}
+  return null;
+}
+
+async function renderLdr(d,b){
+  if(!b){document.getElementById('ldrSec').style.display='none';return}
+  document.getElementById('ldrSec').style.display='block';
+  const members=getMembers(b.title);const ldr=d.ldrData||{};const cur=ldr[b.id];
+  if(!cur){
+    document.getElementById('lCont').innerHTML='<div style="text-align:center;padding:8px 0"><div style="font-size:12px;color:var(--text3);margin-bottom:6px">🎲 '+members.length+' 位成员 + 你</div><button class="btn bp" onclick="openDraw()" style="padding:8px 20px;font-size:12px">开始抽领读员</button></div>';
+    document.getElementById('lN').textContent='等待抽选';document.getElementById('lS').textContent='';document.getElementById('lAv').style.background='#666';document.getElementById('lAv').textContent='?';document.getElementById('lBg').textContent='待抽选';document.getElementById('lBg').className='lbg w';return
+  }
+  if(cur==='p'){
+    document.getElementById('lAv').style.background='#7ab87a';document.getElementById('lAv').textContent='你';
+    document.getElementById('lN').textContent='你（领读员）';document.getElementById('lS').textContent='选一段文字，读出来';
+    document.getElementById('lBg').textContent='🎙️ 领读中';document.getElementById('lBg').className='lbg y';
+    document.getElementById('recBar').style.display='flex';
+    const content=await ensureBookContent(b);
+    if(content){document.getElementById('lCont').innerHTML='<div style="padding:8px 0"><div style="font-size:11px;color:var(--accent);margin-bottom:4px">🎤 领读段落</div><div class="lp">'+content.passage+'<span class="sr">—— '+content.source+'</span></div><div style="font-size:11px;color:var(--text2);line-height:1.6;margin-top:4px">'+content.thought+'</div><div class="lac"><button class="btn bs bsm" onclick="openDraw()">🔄 换人</button></div></div>'}
+    else{document.getElementById('lCont').innerHTML='<div style="padding:8px 0;font-size:12px;color:var(--text2)">📖 翻到第 '+(b.curCh+1)+' 章，读一段你最有感觉的文字。</div>'}
+  }else{
+    const u=members[cur.i];if(!u){document.getElementById('lCont').innerHTML='';return}
+    document.getElementById('lAv').style.background=u.c;document.getElementById('lAv').textContent=u.n[0];
+    document.getElementById('lN').textContent=u.n;document.getElementById('lS').textContent=u.s+' · '+u.d;
+    document.getElementById('lBg').textContent='🎙️ 领读中';document.getElementById('lBg').className='lbg h';
+    document.getElementById('recBar').style.display='none';
+    const content=await ensureBookContent(b);
+    if(content){document.getElementById('lCont').innerHTML='<div class="lp">'+content.passage+'<span class="sr">—— '+content.source+'</span></div><div class="lt2">💬 <strong>'+u.n+' 说：</strong>'+content.thought+'</div><div class="lac"><button class="btn bs bsm" onclick="openDraw()">🔄 换人</button></div>'}
+    else{document.getElementById('lCont').innerHTML='<div class="lp">"今天读第 '+(b.curCh+1)+' 章，有一段特别打动我…"</div><div class="lt2">💬 <strong>'+u.n+'</strong> 正在分享他的阅读感悟</div><div class="lac"><button class="btn bs bsm" onclick="openDraw()">🔄 换人</button></div>'}
+  }
+  updateCM(d,b,cur,members);
+}
+
+async function renderClubLdr(d,b){
+  const lc=document.getElementById('clubLdr');
+  if(b&&d.ldrData&&d.ldrData[b.id]){
+    const l=d.ldrData[b.id],members=getMembers(b.title);
+    if(l==='p'){lc.innerHTML='<div style="font-size:12px;color:var(--text2)">🎤 你是今天的领读员！</div>'}
+    else{const u=members[l.i];if(u)lc.innerHTML='<div style="font-size:12px;color:var(--text2)">🎙️ <strong>'+u.n+'</strong>（'+u.s+'）</div>'}
+  }else lc.innerHTML='<div style="font-size:12px;color:var(--text3)">去阅读页面抽选</div>'
+}
+
+function updateCM(d,b,cur,members){
+  const el=document.getElementById('clubM');if(!b){el.innerHTML='';return}
+  const all=[{n:'你',c:'#7ab87a',isYou:true},...members];
+  const ln=cur==='p'?'你':cur?members[cur.i]?.n:null;
+  el.innerHTML=all.map(m=>{const il=m.n===ln||(m.isYou&&ln==='你');return '<div class="cm2'+(m.isYou?' you':'')+'"><div class="ma" style="background:'+(m.c||'var(--accent)')+'">'+(m.n||'你')[0]+'</div><span class="mn">'+(m.n||'你')+'</span>'+(il?'<span class="mr">🎙️</span>':'')+'</div>'}).join('');
+  document.getElementById('mCount').textContent=all.length;
+}
+function openDraw(){const d=load(),b=d.books.find(x=>x.id===d.cur[0]);if(!b){toast('请先选书');return}
+  const m=getMembers(b.title);const used=d.ldrData&&d.ldrData[b.id];
+  document.getElementById('drawC').innerHTML='<div style="font-size:12px;color:var(--text2);margin-bottom:8px">'+(m.length+1)+' 位成员</div><div style="display:flex;flex-wrap:wrap;gap:5px;justify-content:center;margin-bottom:6px"><span style="padding:4px 10px;border-radius:12px;background:rgba(122,184,122,.1);color:#7ab87a;font-size:11px">👤 你</span>'+m.map(x=>'<span style="padding:4px 10px;border-radius:12px;background:rgba(200,180,160,.04);color:var(--text2);font-size:11px">'+x.n+'</span>').join('')+'</div><div style="font-size:10px;color:var(--text3)">'+(used?'上次：'+(used==='p'?'你':m[used.i]?.n||'—'):'尚未抽选')+'</div>';
+  document.getElementById('drawM').classList.add('show');document.getElementById('drawBtn').disabled=false;document.getElementById('drawBtn').textContent='🎲 抽选'}
+function closeDraw(){document.getElementById('drawM').classList.remove('show')}
+function execDraw(){const d=load(),b=d.books.find(x=>x.id===d.cur[0]);if(!b){closeDraw();return}
+  const m=getMembers(b.title);const r=sr(b.id+'_'+Date.now());const roll=r();
+  if(!d.ldrData)d.ldrData={};
+  if(roll<0.2){d.ldrData[b.id]='p';save(d);document.getElementById('drawBtn').textContent='✅ 抽中你了！';document.getElementById('drawBtn').disabled=true;setTimeout(()=>{closeDraw();renderLdr(d,b);toast('🎤 你被抽中为领读员！')},800)}
+  else{const idx=Math.floor(r()*m.length);d.ldrData[b.id]={i:idx};save(d);document.getElementById('drawBtn').textContent='✅ 抽中 '+m[idx].n;document.getElementById('drawBtn').disabled=true;setTimeout(()=>{closeDraw();renderLdr(d,b);toast('🎤 '+m[idx].n) },800)}
+}
+
+// ====== RECORDING ======
+let mediaRec=null,audioChunks=[],recording=false,recTimer=null,recSec=0;
+async function togRecord(){
+  const btn=document.getElementById('recBtn');
+  if(recording){stopRecording();btn.innerHTML='🔴';btn.className='rec-btn rec'}else{await startRecording();btn.innerHTML='⏹';btn.className='rec-btn stop'}
+  recording=!recording;
+}
+async function startRecording(){
+  try{
+    const stream=await navigator.mediaDevices.getUserMedia({audio:true});
+    mediaRec=new MediaRecorder(stream);audioChunks=[];
+    mediaRec.ondataavailable=e=>{if(e.data.size>0)audioChunks.push(e.data)};
+    mediaRec.onstop=()=>{const blob=new Blob(audioChunks,{type:'audio/webm'});saveRecord(blob)};
+    mediaRec.start();
+    recSec=0;
+    if(recTimer)clearInterval(recTimer);
+    document.getElementById('recStatus').textContent='🔴 录音中…';
+    recTimer=setInterval(()=>{recSec++;const m=String(Math.floor(recSec/60)).padStart(2,'0'),s=String(recSec%60).padStart(2,'0');document.getElementById('recTime').textContent=m+':'+s},1000);
+  }catch(e){toast('录音权限被拒绝')}
+}
+function stopRecording(){
+  if(mediaRec&&mediaRec.state!=='inactive'){mediaRec.stop();mediaRec.stream.getTracks().forEach(t=>t.stop())}
+  if(recTimer){clearInterval(recTimer);recTimer=null}
+  document.getElementById('recStatus').textContent='✅ 录音完成';
+}
+function saveRecord(blob){
+  const id=Date.now().toString(36);
+  const reader=new FileReader();
+  reader.onload=function(e){
+    let d=load();
+    if(!d.recordings)d.recordings={};
+    d.recordings[id]=e.target.result;
+    d.recCount=(d.recCount||0)+1;
+    // Try speech-to-text
+    tryRecognition(d,id);
+    save(d);
+    renderRecBar(id);
+    toast('🎤 录音已保存');
+  };
+  reader.readAsDataURL(blob);
+}
+function tryRecognition(d,id){
+  if(!window.SpeechRecognition&&!window.webkitSpeechRecognition)return;
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  const rec=new SR();rec.lang='zh-CN';rec.interimResults=false;
+  rec.onresult=function(e){const text=e.results[0][0].transcript;if(d.recordings)d.recordings[id+'_txt']=text;toast('📝 转写：'+text);renderRecBar(id)};
+  rec.onerror=function(){};rec.start();
+}
+function renderRecBar(id){
+  const d=load();
+  const bar=document.getElementById('recBar');
+  if(!d.recordings||!d.recordings[id]){document.getElementById('playBtn').style.display='none';document.getElementById('delBtn').style.display='none';return}
+  document.getElementById('playBtn').style.display='inline-flex';document.getElementById('delBtn').style.display='inline-flex';
+  document.getElementById('recStatus').textContent='🎤 有录音 '+(d.recordings[id+'_txt']?'· 📝 已转写':'');
+  document.getElementById('playBtn').onclick=function(){playRecord(id)};
+  document.getElementById('delBtn').onclick=function(){delRecord(id)};
+}
+let _actx=null;
+async function _play(data){
+  if(!_actx)_actx=new (window.AudioContext||window.webkitAudioContext)();
+  await _actx.resume();
+  const r=await fetch(data),b=await r.arrayBuffer(),buf=await _actx.decodeAudioData(b);
+  const s=_actx.createBufferSource();s.buffer=buf;s.connect(_actx.destination);s.start(0)
+}
+async function playRecord(id){
+  if(!id){
+    const d=load();if(!d.recordings)return;const keys=Object.keys(d.recordings).filter(k=>!k.endsWith('_txt'));
+    if(!keys.length)return;id=keys[keys.length-1]
+  }
+  const d=load();const data=d.recordings[id];if(!data){toast('录音数据丢失');return}
+  try{await _play(data)}catch(e){toast('⚠️ 播放失败：'+e.message)}
+}
+function delRecord(id){
+  if(!id){const d=load();if(!d.recordings)return;const keys=Object.keys(d.recordings).filter(k=>!k.endsWith('_txt'));if(!keys.length)return;id=keys[keys.length-1]}
+  let d=load();if(d.recordings){delete d.recordings[id];delete d.recordings[id+'_txt']}
+  save(d);document.getElementById('playBtn').style.display='none';document.getElementById('delBtn').style.display='none';document.getElementById('recStatus').textContent='已删除';
+  toast('🗑️ 录音已删除');
+}
+
+// ====== CLUB ======
+let _dsTimer=null;
+async function renderClub(d,b){
+  if(!d)d=load();if(!b)b=d.books.find(x=>x.id===d.cur[0]);
+  const disc=document.getElementById('clubD');
+  const key=dsk();
+  // Cache questions: only regenerate when book changes
+  let qCache=d.discussQ;
+  if(!qCache||qCache.bid!==(b?b.id:null)){
+    qCache={bid:b?b.id:null,qs:null};
+    if(key&&b){
+      try{
+        const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{
+          method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+          body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:'搜索关于《'+b.title+'》的真实讨论话题，返回2个适合读书会讨论的问题，每个问题10-20字。直接返回JSON数组格式：["问题1","问题2"]'},{role:'user',content:'为《'+b.title+'》生成讨论问题'}],stream:false})
+        });
+        const data=await resp.json();
+        if(data.choices){try{const p=JSON.parse(data.choices[0].message.content);if(Array.isArray(p)&&p.length>=2)qCache.qs=p.slice(0,2)}catch(e){}}
+      }catch(e){}
+    }
+    if(!qCache.qs){const qs=['今天最有感觉的一句话？','给作者提一个问题？','哪个场景联想到自己？','你不同意什么观点？','读完情绪怎么样？'];const e=env();qCache.qs=[qs[e.hour%qs.length],qs[(e.hour+1)%qs.length]]}
+    d.discussQ=qCache;save(d);
+  }
+  const questions=qCache.qs||[];
+  const hist=(d.discussHist||[]).filter(h=>!h.auto);
+  let html='';
+  questions.forEach((q,i)=>{
+    const entry=hist.find(h=>h.q===q);
+    html+='<div class="di" id="discCard'+i+'"><div class="q">'+q+'</div><span class="tg t1">讨论</span>';
+    if(entry){
+      html+='<div class="du"><span class="mu">你</span>'+entry.u+'</div>';
+      html+=(entry.a?'<div class="drp"><span class="mu">领读员</span>'+entry.a+'</div>':'<div style="padding:4px 0"><span class="mu" style="color:var(--text3)">⏳ AI 回应中…</span></div>');
+      html+='</div>';
+    }else{
+      html+='<div class="dr"><textarea placeholder="写下你的想法…" id="discussInp'+i+'"></textarea></div>'
+        +'<div class="br" style="margin-top:4px"><button class="btn bp bsm" onclick="sendDiscussion('+i+')">💬 发送讨论'+(key?'':'（需 API Key）')+'</button></div>';
+    }
+  });
+
+  // Spontaneous member discussions
+  const auto=(d.discussHist||[]).filter(h=>h.auto).slice(-3);
+  if(auto.length>0){
+    html+='<div style="margin-top:6px;padding:4px 0;border-top:1px solid var(--border)"><div style="font-size:10px;color:var(--text3);margin-bottom:2px">💬 成员讨论</div>'
+      +'<div data-autobox="1">'+auto.map(h=>'<div style="font-size:10px;color:var(--text2);padding:2px 0;line-height:1.5"><span style="color:var(--accent)">'+h.m+'</span> '+h.u+'</div>').join('')+'</div>'
+      +'</div>';
+  }
+
+  // Free discussion
+  html+='<div style="margin-top:6px;border-top:1px solid var(--border);padding-top:6px"><div class="qa-m" id="freeDM" style="max-height:100px">'
+    +(hist.filter(h=>h.free).slice(-3).map(h=>'<div class="qa-m2"><span class="mu">你</span>'+h.u+'<br><span class="mu">领读员</span>'+(h.a||'⏳')+'</div>').join('')||'<div style="font-size:10px;color:var(--text3);padding:3px 0">自由讨论开始</div>')
+    +'</div><div class="qa-i"><input type="text" id="freeDInp" placeholder="自由讨论…" onkeydown="if(event.key===\'Enter\')freeDiscuss()"><button class="btn bp bsm" onclick="freeDiscuss()">发送</button></div></div>';
+
+  disc.innerHTML=html;
+  const fm=document.getElementById('freeDM');if(fm)fm.scrollTop=fm.scrollHeight;
+  const ch=document.getElementById('chall');
+  if(!b)ch.innerHTML='先开始读一本书';
+  else if(d.streak<7)ch.innerHTML='🔥 连续 <strong>'+d.streak+'</strong> 天。再 '+(7-d.streak)+' 天解锁「专注者」。';
+  else if(d.streak<14)ch.innerHTML='🔥 连续 '+d.streak+' 天！目标：14 天。';
+  else ch.innerHTML='🔥 连续 '+d.streak+' 天！真正的阅读者 🎉';
+  await renderClubLdr(d,b);renderQA(d,b);
+
+  // Start spontaneous discussion timer
+  if(_dsTimer)clearInterval(_dsTimer);
+  if(key&&b){_dsTimer=setInterval(()=>autoDiscuss(d,b),45000+Math.random()*30000)}
+}
+function stopAutoDiscuss(){if(_dsTimer){clearInterval(_dsTimer);_dsTimer=null}}
+
+async function autoDiscuss(d,b){
+  if(!d)d=load();if(!b)b=d.books.find(x=>x.id===d.cur[0]);if(!b||!dsk())return;
+  const members=getMembers(b.title);
+  const m=members[Math.floor(Math.random()*members.length)];
+  const topics=['这本书最打动你的是什么','对主角的看法','最喜欢的一段话','看到这里有什么感受','想到了什么生活经历'];
+  const topic=topics[Math.floor(Math.random()*topics.length)];
+  try{
+    const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+dsk()},
+      body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:'你是读书会成员'+m.n+'（'+m.s+'）。正在读《'+b.title+'》。请围绕"'+topic+'"说一句真实的感想（25字内），口语化，像一个真实的人在聊天。'},{role:'user',content:'说说你的想法'}],stream:false})
+    });
+    const data=await resp.json();
+    if(data.choices){const a=data.choices[0].message.content;
+      d=load();if(!d.discussHist)d.discussHist=[];
+      d.discussHist.push({q:'auto',u:a,a:'',free:false,auto:true,ts:Date.now(),m:m.n+':'});
+      save(d);
+      // Update auto section inline
+      const autoDiv=document.getElementById('clubD')?.querySelector('[data-autobox="1"]');
+      if(autoDiv){
+        const autos=(load().discussHist||[]).filter(h=>h.auto).slice(-3);
+        autoDiv.innerHTML=autos.map(h=>'<div style="font-size:10px;color:var(--text2);padding:2px 0;line-height:1.5"><span style="color:var(--accent)">'+h.m+'</span> '+h.u+'</div>').join('');
+      }
+    }
+  }catch(e){}
+}
+
+async function sendDiscussion(idx){
+  const q=document.querySelectorAll('.di .q')[idx];
+  if(!q)return;
+  const question=q.textContent;
+  const inp=document.getElementById('discussInp'+idx);
+  const text=inp?inp.value.trim():'';
+  if(!text){toast('先写下你的想法');return}
+  inp.value='';
+  let d=load();if(!d.discussHist)d.discussHist=[];
+  const key=dsk();
+  const entry={q:question,u:text,a:'',free:false,ts:Date.now()};
+  d.discussHist.push(entry);save(d);
+  // Update only this card, not full re-render
+  const card=document.getElementById('discCard'+idx);
+  if(card)card.innerHTML='<div class="q">'+question+'</div><span class="tg t1">讨论</span><div class="du"><span class="mu">你</span>'+text+'</div>'+(key?'<div style="padding:4px 0"><span class="mu" style="color:var(--text3)">⏳ AI 回应中…</span></div>':'')+'</div>';
+  if(!key){toast('配置 API Key 获取 AI 回应');return}
+  try{
+    const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:'你是读书会成员。正在讨论「'+question+'」。用户说：'+text+'。请以一位温暖有趣的读书会成员身份回应（50字内），结合《'+(load().books.find(x=>x.id===load().cur)||{}).title+'》。口语化，不要标签。'},{role:'user',content:'回应我的想法'}],stream:false})
+    });
+    const data=await resp.json();
+    if(data.choices){const a=data.choices[0].message.content;
+      d=load();const e2=d.discussHist.find(h=>h.ts===entry.ts);if(e2)e2.a=a;save(d);
+      const card2=document.getElementById('discCard'+idx);
+      if(card2)card2.innerHTML='<div class="q">'+question+'</div><span class="tg t1">讨论</span><div class="du"><span class="mu">你</span>'+text+'</div><div class="drp"><span class="mu">领读员</span>'+a+'</div></div>'
+    }
+  }catch(e){toast('AI 回应失败')}
+}
+async function freeDiscuss(){
+  const inp=document.getElementById('freeDInp');const text=inp.value.trim();if(!text)return;
+  const key=dsk();if(!key){toast('请配置 API Key');return}
+  let d=load();if(!d.discussHist)d.discussHist=[];
+  inp.value='';
+  const entry={q:'自由讨论',u:text,a:'',free:true,ts:Date.now()};
+  const curB=(load().books.find(x=>x.id===load().cur)||{});
+  d.discussHist.push(entry);save(d);
+  // Refresh free discussion area
+  d=load();const hist=d.discussHist.filter(h=>h.free).slice(-4);
+  const fm=document.getElementById('freeDM');
+  if(fm)fm.innerHTML=hist.map(h=>'<div class="qa-m2"><span class="mu">你</span>'+h.u+'<br><span class="mu">领读员</span>'+(h.a||'⏳')+'</div>').join('')||'<div style="font-size:10px;color:var(--text3);padding:3px 0">自由讨论开始</div>';
+  if(fm)fm.scrollTop=fm.scrollHeight;
+  try{
+    const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'deepseek-chat',messages:[{role:'system',content:'你是读书会领读员。用户说：'+text+'。请结合当前在读的《'+curB.title+'》回应（80字内），口语化有温度。'},{role:'user',content:text}],stream:false})
+    });
+    const data=await resp.json();
+    if(data.choices){const a=data.choices[0].message.content;
+      d=load();const e2=d.discussHist.find(h=>h.ts===entry.ts);if(e2)e2.a=a;save(d);
+      const fd=d.discussHist.filter(h=>h.free).slice(-4);
+      const fm2=document.getElementById('freeDM');
+      if(fm2)fm2.innerHTML=fd.map(h=>'<div class="qa-m2"><span class="mu">你</span>'+h.u+'<br><span class="mu">领读员</span>'+(h.a||'⏳')+'</div>').join('');
+    }
+  }catch(e){toast('回复失败')}
+}
+
+function saveDiscussion(el,q){const v=el.value.trim();if(!v)return;let d=load();d.journal.push({date:new Date().toDateString(),note:'💬 讨论「'+q+'」: '+v,timeOfDay:env().ti});save(d);renderJournal();toast('📝 已保存')}
+
+// ====== QA ======
+function renderQA(d,b){
+  const box=document.getElementById('qaBox');
+  const key=dsk();const hist=d.qaHist||[];const recent=hist.slice(-20);
+  box.innerHTML='<div class="qa-m" id="qaM">'+recent.map(m=>'<div class="qa-m2 '+m.role+'"><span class="mu">'+(m.role==='q'?'你':'领读员')+'</span>'+m.text+'</div>').join('')+'</div><div class="qa-i"><input type="text" id="qaIn" placeholder="向领读员提问…" onkeydown="if(event.key===\'Enter\')sendQA()"><button class="btn bp bsm" onclick="sendQA()">发送</button></div>'+(key?'':'<div style="font-size:9px;color:var(--text3);margin-top:3px">⚙️ 在设置中配置 DeepSeek API Key 可自动联网问答</div>');
+  const ms=document.getElementById('qaM');if(ms)ms.scrollTop=ms.scrollHeight;
+}
+async function sendQA(){
+  const inp=document.getElementById('qaIn');const q=inp.value.trim();if(!q)return;
+  const d=load(),b=d.books.find(x=>x.id===d.cur[0]);
+  if(!d.qaHist)d.qaHist=[];d.qaHist.push({role:'q',text:q});inp.value='';save(d);
+  renderQA(d,b);
+  const key=dsk();
+  if(!key){toast('请先在设置中配置 DeepSeek API Key');return}
+  try{
+    const ctx=b?'当前读书会正在讨论《'+b.title+'》('+b.author+')，分类：'+b.category+'。成员有：'+(b?getMembers(b.title).map(x=>x.n+'('+x.s+')').join('、'):'')+'。请作为领读员回答用户的问题，结合书籍真实内容。':'';
+    const msgs=[{role:'system',content:'你是读书会的领读员，温暖、有深度、像朋友。回答要结合书籍的真实内容，可以联网搜索补充。回答控制在150字以内，口语化。'+ctx}];
+    const recent=(d.qaHist||[]).slice(-10);
+    recent.forEach(m=>msgs.push({role:m.role==='q'?'user':'assistant',content:m.text}));
+    const resp=await fetch('https://api.deepseek.com/v1/chat/completions',{
+      method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+key},
+      body:JSON.stringify({model:'deepseek-chat',messages:msgs,stream:false})
+    });
+    const data=await resp.json();
+    if(data.error){toast('API 错误：'+data.error.message);d.qaHist.push({role:'a',text:'抱歉，我现在无法回答。'})}
+    else{const answer=data.choices?data.choices[0].message.content:'抱歉，我没有理解。';d.qaHist.push({role:'a',text:answer});d.qaCount=(d.qaCount||0)+1;checkAch(d)}
+    save(d);renderQA(d,b);
+  }catch(e){toast('请求失败：'+e.message);d.qaHist.push({role:'a',text:'抱歉，网络出了点问题。'});save(d);renderQA(d,b)}
+}
+
+// ====== JOURNAL ======
+function saveJournal(){
+  const t=document.getElementById('jourInput').value.trim();if(!t){toast('写点什么吧');return}
+  let d=load();const e=env();d.journal.push({date:new Date().toDateString(),note:t,timeOfDay:e.ti});
+  save(d);document.getElementById('jourInput').value='';renderJournal();toast('📝 已保存')
+}
+function renderJournal(){
+  const d=load(),entries=[...d.journal].reverse();const c=document.getElementById('jEntries'),e=document.getElementById('jEm');
+  if(!entries.length){c.innerHTML='';e.style.display='block';return}
+  e.style.display='none';
+  const ic={dawn:'🌅',morning:'☀️',afternoon:'🌤',sunset:'🌇',evening:'🌆',night:'🌙'};
+  c.innerHTML=entries.slice(0,50).map(j=>'<div class="je"><div class="jd">'+(ic[j.timeOfDay]||'📖')+' '+j.date+(j.chapter?' · 第'+j.chapter+'章':'')+'</div><div class="jc">'+j.note+'</div>'+(j.xp?'<div class="jx">+'+j.xp+' XP</div>':'')+'</div>').join('');
+}
+
+// ====== ACH ======
+function checkAch(d){ACH.forEach(a=>{if(!d.unlocked.includes(a.id)&&a.ck(d)){d.unlocked.push(a.id);addXp(d,a.x,'a');toast('🏆 解锁「'+a.n+'」+'+a.x+' XP')}})}
+function renderAch(d){const g=document.getElementById('achG');let u=0;
+  g.innerHTML=ACH.map(a=>{const h=d.unlocked.includes(a.id);if(h)u++;return '<div class="ac '+(h?'un':'lo')+'">'+(h?'<div class="sh"></div>':'')+'<span class="ai">'+(h?a.i:'🔒')+'</span><div class="an">'+a.n+'</div><div class="ad">'+(a.d||'')+'</div>'+(h?'<div class="ae">+'+a.x+' XP</div>':'')+'</div>'}).join('');
+  document.getElementById('achU').textContent=u;document.getElementById('achT').textContent=ACH.length;document.getElementById('achB').textContent=u;}
+
+// ====== LIBRARY ======
+let _selIds=new Set;
+function selAll(){let d=load();d.books.forEach(b=>_selIds.add(b.id));updateSelBar();renderLib()}
+function selNone(){_selIds.clear();updateSelBar();renderLib()}
+function toggleSelId(id){if(_selIds.has(id))_selIds.delete(id);else _selIds.add(id);updateSelBar()}
+function updateSelBar(){const n=_selIds.size;const bar=document.getElementById('selBar');bar.style.display=n?'flex':'none';document.getElementById('selCnt').textContent='已选 '+n+' 本'}
+function batchDel(){let d=load();const n=_selIds.size;d.books=d.books.filter(b=>!_selIds.has(b.id));d.cur=d.cur.filter(id=>d.books.some(b=>b.id===id));save(d);_selIds.clear();updateSelBar();renderAll();toast('🗑️ 已删除 '+n+' 本书')}
+function batchDone(){let d=load();d.books.forEach(b=>{if(_selIds.has(b.id)&&!b.done){b.done=true;b.curCh=b.chapters;d.finishedBooks++}});d.cur=d.cur.filter(id=>!_selIds.has(id));save(d);_selIds.clear();updateSelBar();renderAll();toast('✅ 已标记')}
+function batchCat(){if(!_selIds.size)return;const cats=Object.keys(CAT).map(k=>CAT[k].e+' '+k);const c=prompt('输入新分类：\n'+cats.join('\n'));if(!c)return;const key=Object.keys(CAT).find(k=>CAT[k].e+' '+k===c||k===c);if(!key){toast('❌ 无效分类');return}let d=load();d.books.forEach(b=>{if(_selIds.has(b.id)&&!b.done)b.category=key});save(d);_selIds.clear();updateSelBar();renderAll();toast('✅ 已更新')}
+function renderLib(){const d=load(),s=(document.getElementById('libS').value||'').toLowerCase();const g=document.getElementById('libG');const ac=document.querySelector('.ctg.act');
+  let books=d.books;if(s)books=books.filter(b=>b.title.toLowerCase().includes(s));if(ac&&ac.dataset.c!=='all')books=books.filter(b=>b.category===ac.dataset.c);
+  if(!books.length){g.innerHTML='<div class="lem"><div class="ei">📚</div>'+(s?'没有找到':'书房还是空的')+'</div>';return}
+  g.innerHTML=books.map(b=>{const cat=CAT[b.category]||{e:'📖',c:'#666'};const st=b.done?'d':d.cur.includes(b.id)?'r':'p';const stt=b.done?'已读完':d.cur.includes(b.id)?'在读':'未读';
+    const checked=_selIds.has(b.id)?'checked':'';
+     const cb='<input type="checkbox" '+checked+' onclick="event.stopPropagation();toggleSelId(\''+b.id+'\')" style="position:absolute;top:4px;left:4px;width:18px;height:18px;z-index:10;accent-color:var(--accent);cursor:pointer;opacity:0.7">';
+    const click=b.done?'':'onclick="selB(\''+b.id+'\')"';
+    return '<div class="lb" style="position:relative">'+cb+'<div class="lcv" style="background:linear-gradient(135deg,'+cat.c+','+cat.c+'cc);cursor:pointer" '+click+'>'+cat.e+'<div class="lbg" style="background:'+cat.c+'">'+b.category+'</div></div><div class="lt" style="cursor:pointer" '+click+'>'+b.title+'</div><div class="la2">'+b.author+'</div><span class="lst '+st+'">'+stt+'</span><div style="margin-top:4px;display:flex;gap:3px"><button class="btn bs bsm" onclick="event.stopPropagation();showEdit(\''+b.id+'\')" style="padding:2px 6px;font-size:8px">✏️</button><button class="btn bs bsm" onclick="event.stopPropagation();if(confirm(\'确定删除《'+b.title+'》？\'))deleteBook(\''+b.id+'\')" style="padding:2px 6px;font-size:8px;color:#e74c3c">🗑️</button></div></div>'}).join('')}
+function renderCats(){document.getElementById('catF').innerHTML='<span class="ctg act" data-c="all" onclick="fc(this)">全部</span>'+Object.keys(CAT).map(k=>'<span class="ctg" data-c="'+k+'" onclick="fc(this)">'+CAT[k].e+' '+k+'</span>').join('')}
+function fc(el){document.querySelectorAll('.ctg').forEach(t=>t.classList.remove('act'));el.classList.add('act');renderLib()}
+function selB(id){let d=load();if(d.cur.includes(id)){d.cur=d.cur.filter(x=>x!==id)}else{d.cur.push(id)}save(d);if(d.cur.length){const b=d.books.find(x=>x.id===d.cur[0]);d.curCh=0;if(b&&!b.done){b.curCh=0;save(d);renderAll();sw('read');enterRead();toast('📖 开始读《'+(b?b.title:'')+'》')}}else{renderAll();toast('已从阅读列表中移除')}}
+let _edId=null;
+function showEdit(id){
+  _edId=id;const d=load(),b=d.books.find(x=>x.id===id);if(!b)return;
+  document.getElementById('edT').value=b.title;
+  document.getElementById('edA').value=b.author;
+  const sel=document.getElementById('edC');
+  sel.innerHTML=Object.keys(CAT).map(k=>'<option value="'+k+'"'+(k===b.category?' selected':'')+'>'+CAT[k].e+' '+k+'</option>').join('');
+  document.getElementById('edCh').value=b.chapters;
+  document.getElementById('edCur').value=b.curCh||0;
+  document.getElementById('edHint').textContent=b.done?'📗 已读完':'📖 '+(b.curCh||0)+'/'+b.chapters+' 章';
+  document.getElementById('editM').classList.add('show')
+}
+function hideEdit(){document.getElementById('editM').classList.remove('show');_edId=null}
+function saveEdit(){
+  if(!_edId)return;let d=load();const b=d.books.find(x=>x.id===_edId);if(!b)return;
+  b.title=document.getElementById('edT').value.trim()||b.title;
+  b.author=document.getElementById('edA').value.trim()||'未知作者';
+  b.category=document.getElementById('edC').value;
+  b.chapters=parseInt(document.getElementById('edCh').value)||10;
+  b.curCh=Math.min(parseInt(document.getElementById('edCur').value)||0,b.chapters);
+  if(b.curCh>=b.chapters){b.done=true;d.finishedBooks++}else{b.done=false}
+  save(d);hideEdit();renderAll();toast('✅ 已保存')
+}
+function deleteBook(id){
+  let d=load();
+  if(id){const idx=d.books.findIndex(x=>x.id===id);if(idx>-1){d.books.splice(idx,1);save(d);renderAll();toast('🗑️ 已删除')}return}
+  // Called from edit modal
+  id=_edId;if(!id)return;const b=d.books.find(x=>x.id===id);if(!b)return;
+  if(!confirm('确定删除《'+b.title+'》？'))return;
+  const idx=d.books.findIndex(x=>x.id===id);
+  if(idx>-1){d.books.splice(idx,1);save(d);hideEdit();renderAll();toast('🗑️ 已删除')}
+}
+
+// ====== SETTINGS ======
+function showSet(){document.getElementById('setM').classList.add('show');document.getElementById('dsKey').value=dsk();document.getElementById('scenePref').value=scPref()}
+function hideSet(){document.getElementById('setM').classList.remove('show')}
+function saveSet(){const k=document.getElementById('dsKey').value.trim();if(k)localStorage.setItem(DSK,k);else localStorage.removeItem(DSK);localStorage.setItem(SCENEK,document.getElementById('scenePref').value);hideSet();toast('⚙️ 已保存');renderAll()}
+function togXp(){const el=document.getElementById('xpCard'),d=load();document.getElementById('xpB').innerHTML='📖 阅读：'+d.xpR+' XP<br>🏆 成就：'+d.xpA+' XP<br>🔥 连胜：'+d.xpS+' XP<div class="sp2">总计：'+d.totalXp+' XP</div>';el.style.display=el.style.display==='none'?'block':'none'}
+
+// ====== CANVAS ======
+function initCanvas(){const c=document.getElementById('ambientCanvas'),ctx=c.getContext('2d');let W,H;
+  function rs(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}window.addEventListener('resize',rs);rs();
+  const e=env();let p=[];const pref=scPref();
+  const isF=pref==='fire'||(pref==='auto'&&(e.ti==='night'||e.ti==='evening'));
+  const isS=pref==='snow'||(pref==='auto'&&e.sea==='winter'&&!isF);
+  const isR=pref==='rain'||(pref==='auto'&&(e.sea==='spring'||e.sea==='summer')&&!isF&&!isS);
+  if(isF)for(let i=0;i<35;i++)p.push({x:W*.7+Math.random()*100-50,y:H*.7+Math.random()*30,r:2+Math.random()*10,vy:-.3-Math.random()*2,vx:(Math.random()-.5)*.5,life:.5+Math.random()*.5,type:'f',hue:25+Math.random()*35,sat:70+Math.random()*30,light:40+Math.random()*40});
+  if(isS)for(let i=0;i<80;i++)p.push({x:Math.random()*W,y:Math.random()*H,r:1+Math.random()*3,vy:.2+Math.random()*.8,vx:-.2+Math.random()*.4,type:'s',sw:Math.random()*Math.PI*2,ss:.01+Math.random()*.02});
+  if(isR)for(let i=0;i<50;i++)p.push({x:Math.random()*W,y:Math.random()*H,len:10+Math.random()*20,vy:4+Math.random()*4,vx:-1+Math.random()*2,type:'r',op:.2+Math.random()*.3});
+  for(let i=0;i<15;i++)p.push({x:Math.random()*W,y:Math.random()*H,r:.5+Math.random()*1.5,vy:-.02-Math.random()*.05,vx:.01+Math.random()*.03,type:'d',op:.08+Math.random()*.12});
+  let fr=0;function draw(){
+    ctx.clearRect(0,0,W,H);fr++;
+    p.forEach(a=>{if(a.type==='f'){const lv=Math.sin(fr*.05+a.life*10)*.3;const g=ctx.createRadialGradient(a.x,a.y,0,a.x,a.y,a.r*(1+lv));g.addColorStop(0,`hsla(${a.hue},${a.sat}%,${a.light+10}%,.6)`);g.addColorStop(.5,`hsla(${a.hue},${a.sat}%,${a.light}%,.25)`);g.addColorStop(1,`hsla(${a.hue},${a.sat}%,${a.light-20}%,0)`);ctx.fillStyle=g;ctx.beginPath();ctx.arc(a.x,a.y,a.r*(1+lv),0,Math.PI*2);ctx.fill();a.x+=a.vx;a.y+=a.vy;a.vy-=.02;if(a.y<H*.5||a.life<.2){a.x=W*.7+Math.random()*100-50;a.y=H*.7+Math.random()*30;a.life=.5+Math.random()*.5}a.life-=.003}
+      else if(a.type==='s'){a.sw+=a.ss;ctx.beginPath();ctx.fillStyle='rgba(255,255,255,.22)';ctx.arc(a.x+Math.sin(a.sw)*15,a.y,a.r,0,Math.PI*2);ctx.fill();a.y+=a.vy;a.x+=a.vx;if(a.y>H){a.y=-10;a.x=Math.random()*W}}
+      else if(a.type==='r'){ctx.beginPath();ctx.strokeStyle=`rgba(180,200,230,${a.op})`;ctx.lineWidth=.7;ctx.moveTo(a.x,a.y);ctx.lineTo(a.x+a.vx,a.y-a.len);ctx.stroke();a.y+=a.vy;a.x+=a.vx;if(a.y>H+20){a.y=-20;a.x=Math.random()*W}}
+      else if(a.type==='d'){ctx.beginPath();ctx.fillStyle=`rgba(255,220,180,${a.op})`;ctx.arc(a.x,a.y,a.r,0,Math.PI*2);ctx.fill();a.y+=a.vy;a.x+=Math.sin(fr*.01+a.x*.01)*.3;if(a.y<0||a.y>H){a.y=Math.random()*H;a.x=Math.random()*W}}
+    });requestAnimationFrame(draw)}draw()
+}
+
+// ====== RENDER ======
+function renderAll(){
+  const d=load(),e=apply();
+  document.getElementById('sStr').textContent=d.streak;
+  const tr=document.getElementById('sTr');if(d.streak>=7)tr.textContent='🔥';else if(d.streak>=3)tr.textContent='👍';else tr.textContent=d.streak>0?'🌱':'';
+  tr.className='t'+(d.streak>=3?' up':'');
+  document.getElementById('sDay').textContent=d.totalDays;document.getElementById('sBk').textContent=d.finishedBooks;
+  document.getElementById('sPg').textContent=d.totalPages;document.getElementById('sXp').textContent=d.totalXp;document.getElementById('sLv').textContent=d.level;
+  const l=lv(d.totalXp);document.getElementById('lvD').textContent=d.level;document.getElementById('xpD').style.width=l.pct+'%';document.getElementById('xpSD').textContent=d.totalXp+'/'+LVLS[Math.min(l.lv,LVLS.length-1)].x;
+  const cc=document.getElementById('curBk'),nc=document.getElementById('noBk');
+  if(d.cur.length){const b=d.books.find(x=>x.id===d.cur[0]);
+    if(b){cc.style.display='block';nc.style.display='none';const cat=CAT[b.category]||{e:'📖',c:'#666'};
+      document.getElementById('ccCv').style.background=`linear-gradient(135deg,${cat.c},${cat.c}cc)`;
+      document.getElementById('ccEm').textContent=cat.e;document.getElementById('ccCl').textContent=b.category;document.getElementById('ccCl').style.background=cat.c;
+      document.getElementById('ccT').textContent=b.title;document.getElementById('ccA').textContent=b.author;
+      document.getElementById('ccB').innerHTML=cat.e+' '+b.category;document.getElementById('ccB').style.background=cat.c+'22';document.getElementById('ccB').style.color=cat.c;
+      const ch=b.curCh||0,p=Math.round(ch/b.chapters*100);document.getElementById('ccPr').style.width=p+'%';document.getElementById('ccPT').textContent=ch+'/'+b.chapters+'章';document.getElementById('ccPP').textContent=p+'%'
+    }}else{if(d.books.length>0){cc.style.display='block';nc.style.display='none';document.getElementById('ccCv').style.background='linear-gradient(135deg,#666,#444)';document.getElementById('ccEm').textContent='✅';document.getElementById('ccCl').textContent='';document.getElementById('ccT').textContent='无在读';document.getElementById('ccA').textContent='选一本';document.getElementById('ccB').innerHTML='';document.getElementById('ccPr').style.width='100%';document.getElementById('ccPT').textContent='—';document.getElementById('ccPP').textContent=''}
+    else{cc.style.display='none';nc.style.display='block';document.getElementById('noBk').innerHTML='<div class="ctt">📚 欢迎加入读书会</div><p style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:10px">没有 KPI。只有书、咖啡、和一盏温暖的台灯。</p><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="btn bp" onclick="showAdd()">+ 搜索添加</button><button class="btn bs" onclick="showImport()">📥 豆瓣导入</button><button class="btn bs" onclick="showUpload()">📤 上传书目</button></div>'}}
+  renderLib();renderAch(d);renderJournal();
+  const b2=d.books.find(x=>x.id===d.cur[0]);
+  if(!b2){document.getElementById('clubM').innerHTML='';document.getElementById('clubLdr').innerHTML='';document.getElementById('clubD').innerHTML='';document.getElementById('chall').innerHTML='';document.getElementById('qaBox').innerHTML=''}
+  else renderClub(d,b2).catch(()=>{});
+  if(d.cur.length)renderRS();
+}
+
+function sw(name){
+  try{
+    document.querySelectorAll('.nb').forEach(b=>b.classList.toggle('act',b.dataset.p===name));
+    document.querySelectorAll('.pn').forEach(p=>p.classList.remove('act'));
+    const el=document.getElementById('p-'+name);if(el)el.classList.add('act');
+    if(name!=='club')stopAutoDiscuss();
+    if(name==='read')enterRead();if(name==='ach')renderAch(load());if(name==='jour')renderJournal();if(name==='lib')renderLib();
+    if(name==='club'){const d=load(),b=d.books.find(x=>x.id===d.cur[0]);if(b)renderClub(d,b)}
+  }catch(e){console.error('sw error',e);toast('⚠️ 页面错误，请刷新')}
+}
+
+(function(){
+  try{
+    popCats();renderCats();
+    document.querySelectorAll('.modal-over').forEach(m=>m.addEventListener('click',function(e){if(e.target===this)this.classList.remove('show')}));
+    document.addEventListener('keydown',function(e){if(e.key==='Escape')document.querySelectorAll('.modal-over.show').forEach(m=>m.classList.remove('show'))});
+    document.getElementById('libS').addEventListener('input',renderLib);
+    document.getElementById('navBar').addEventListener('click',function(e){const b=e.target.closest('.nb');if(b&&b.dataset.p){console.log('nav click',b.dataset.p);sw(b.dataset.p)}});
+    // Also add direct listeners to each nav button as fallback
+    document.querySelectorAll('.nb').forEach(function(b){b.addEventListener('click',function(){if(this.dataset.p){console.log('direct click',this.dataset.p);sw(this.dataset.p)}})});
+    window.addEventListener('pagehide',stopAutoDiscuss);
+    renderAll();initCanvas();
+    // Visual confirmation that JavaScript executed
+    var st=document.createElement('div');st.id='jsok';st.style.cssText='position:fixed;bottom:4px;right:6px;font-size:8px;color:#7ab87a;z-index:999;background:#1a1410;padding:1px 4px;border-radius:3px;pointer-events:none';st.textContent='✅ JS OK';document.body.appendChild(st);
+    console.log('✅ Init complete');
+  }catch(e){document.body.innerHTML='<div style="padding:40px;color:#f0ebe6;font-size:14px;line-height:2"><b>⚠️ 加载出错</b><br>'+e.message+'<br><br>尝试刷新页面。如问题持续，请清空浏览器缓存后重试。</div>';console.error(e)}
+})();
+console.log('✅ Book Club loaded v6');
+</script>
+</body>
+</html>
