@@ -667,7 +667,7 @@ function uploadBook(){const t=document.getElementById('upT').value.trim()||upN||
   save(d);hideUpload();document.getElementById('upT').value='';document.getElementById('upA').value='';upC='';renderAll();toast('📤 已上传'+t)}
 // ====== READING ======
 let rTimer=null,rSec=0,rOn=false;
-function enterRead(){const d=load();if(!d.cur.length){sw('lib');return}
+function enterRead(){const d=load();if(!d.cur.length){document.getElementById('readAct').style.display='none';document.getElementById('readEm').style.display='block';return}
   document.getElementById('readAct').style.display='block';document.getElementById('readEm').style.display='none';
   const b=d.books.find(x=>x.id===d.cur[0]);if(!b){document.getElementById('readAct').style.display='none';document.getElementById('readEm').style.display='block';return}
   const e=env();const sn={dawn:'黎明的微光',morning:'阳光洒在书页上',afternoon:'午后时光',sunset:'黄昏的光线',evening:'台灯亮起来了',night:'深夜，全世界都睡了'};
