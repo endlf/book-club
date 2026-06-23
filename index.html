@@ -273,6 +273,7 @@ canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.3}
         <div class="pb"><div class="f" id="rPr" style="width:0%"></div></div>
         <div class="pbt"><span id="rPT">0/0 章</span></div>
         <div class="rt" id="rTim">00:00<span class="u">本次阅读</span></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px" id="rCum"></div>
         <div class="ra">
           <button class="btn bp" id="rStart" onclick="togRead()">▶ 开始计时</button>
           <button class="btn bs" onclick="markDone()">✅ 读完本章</button>
@@ -557,7 +558,7 @@ function hideAdd(){document.getElementById('addM').classList.remove('show')}
 function addBook(){
   const t=document.getElementById('inpT').value.trim();if(!t){toast('请输入书名');return}
   const a=document.getElementById('inpA').value.trim()||'未知作者',c=document.getElementById('inpC').value,ch=parseInt(document.getElementById('inpCh').value)||10;
-  let d=load();d.books.push({id:Date.now().toString(36),title:t,author:a,category:c,chapters:ch,curCh:0,done:false,created:new Date().toISOString()});
+  let d=load();d.books.push({id:Date.now().toString(36),title:t,author:a,category:c,chapters:ch,curCh:0,done:false,readTime:0,created:new Date().toISOString()});
   if(!d.cur.length){d.cur=[d.books[d.books.length-1].id];d.curCh=0}
   save(d);hideAdd();document.getElementById('inpT').value='';document.getElementById('inpA').value='';renderAll();toast('📚 《'+t+'》已加入');
 }
@@ -603,7 +604,7 @@ async function importDouban(){
           for(const line of lines){
             let m=line.match(/《(.+?)》\s*(.+?)·\s*(.+)$/)||line.match(/《(.+?)》\s*(.+)/);
             if(m){const t=m[1].trim(),a=m[2]?m[2].trim().replace(/[·•].*/,'').trim():'豆瓣导入',cat=m[3]?m[3].trim():'文学';
-              d.books.push({id:Date.now().toString(36)+count,title:t,author:a,category:Object.keys(CAT).includes(cat)?cat:'文学',chapters:10,curCh:0,done:true,created:new Date().toISOString()});count++}
+              d.books.push({id:Date.now().toString(36)+count,title:t,author:a,category:Object.keys(CAT).includes(cat)?cat:'文学',chapters:10,curCh:0,done:true,readTime:0,created:new Date().toISOString()});count++}
           }
         }
       }catch(e){}
@@ -621,9 +622,9 @@ async function importDouban(){
         const pub=el.querySelector('.pub');
         let author='豆瓣导入';
         if(pub){const txt=pub.textContent.trim();const m=txt.match(/^\s*(.+?)\s*\/\s*/);if(m)author=m[1].trim().replace(/\s+/g,'')}
-        d.books.push({id:Date.now().toString(36)+count,title:title,author:author,category:'文学',chapters:10,curCh:0,done:true,created:new Date().toISOString()});count++
+        d.books.push({id:Date.now().toString(36)+count,title:title,author:author,category:'文学',chapters:10,curCh:0,done:true,readTime:0,created:new Date().toISOString()});count++
       });
-      if(count===0&&html.length>0){const m2=html.matchAll(/title="([^"]+)"[\s\S]{0,200}?class="pub"[\s\S]{0,200}?([^<]+)/g);for(const m of m2){if(m[1].length>1&&m[1].length<100&&!/^\s*$/.test(m[1])&&!/douban|book|home/i.test(m[1])){d.books.push({id:Date.now().toString(36)+count,title:m[1].trim(),author:(m[2]||'豆瓣导入').trim().split('/')[0].trim(),category:'文学',chapters:10,curCh:0,done:true,created:new Date().toISOString()});count++}}}
+      if(count===0&&html.length>0){const m2=html.matchAll(/title="([^"]+)"[\s\S]{0,200}?class="pub"[\s\S]{0,200}?([^<]+)/g);for(const m of m2){if(m[1].length>1&&m[1].length<100&&!/^\s*$/.test(m[1])&&!/douban|book|home/i.test(m[1])){d.books.push({id:Date.now().toString(36)+count,title:m[1].trim(),author:(m[2]||'豆瓣导入').trim().split('/')[0].trim(),category:'文学',chapters:10,curCh:0,done:true,readTime:0,created:new Date().toISOString()});count++}}}
     }
     document.getElementById('importLoading').style.display='none';
     if(count===0){toast('无法获取豆瓣数据，请使用下方文本粘贴方式导入');return}
@@ -642,10 +643,10 @@ async function importDouban(){
       if(!t){m=line.match(/^(.+?)\s+([\u4e00-\u9fff]{2,4})$/);if(m){t=m[1].trim();a=m[2].trim()}}
       if(t){
         a=a.replace(/[·•].*/,'').trim()||'豆瓣导入';
-        d.books.push({id:Date.now().toString(36)+count,title:t,author:a,category:'文学',chapters:10,curCh:0,done:true,created:new Date().toISOString()});count++
+        d.books.push({id:Date.now().toString(36)+count,title:t,author:a,category:'文学',chapters:10,curCh:0,done:true,readTime:0,created:new Date().toISOString()});count++
       }else{
         const clean=line.replace(/^[\s\d.、-]+/,'').trim();
-        if(clean.length>1&&!/^(小说|作者|出版社|ISBN|评分|标签|日期|来自|首页|豆瓣)/i.test(clean)){d.books.push({id:Date.now().toString(36)+count,title:clean,author:'豆瓣导入',category:'文学',chapters:10,curCh:0,done:true,created:new Date().toISOString()});count++}
+        if(clean.length>1&&!/^(小说|作者|出版社|ISBN|评分|标签|日期|来自|首页|豆瓣)/i.test(clean)){d.books.push({id:Date.now().toString(36)+count,title:clean,author:'豆瓣导入',category:'文学',chapters:10,curCh:0,done:true,readTime:0,created:new Date().toISOString()});count++}
       }
     }
   } else {toast('请填写URL或粘贴文本');return}
@@ -662,22 +663,25 @@ function handleFile(i){const f=i.files[0];if(!f)return;upN=f.name.replace(/\.(tx
   const r=new FileReader();r.onload=function(e){upC=e.target.result;document.getElementById('uploadP').style.display='block';document.getElementById('uploadP').innerHTML='📄 '+f.name+' ('+(f.size/1024).toFixed(1)+'KB)';document.getElementById('upT').value=upN};r.readAsText(f,'UTF-8')}
 function uploadBook(){const t=document.getElementById('upT').value.trim()||upN||'未命名',a=document.getElementById('upA').value.trim()||'上传者';
   if(!upC){toast('请选择文件');return}
-  let d=load();d.books.push({id:Date.now().toString(36),title:t,author:a,category:'文学',chapters:Math.max(1,Math.ceil(upC.length/3000)),curCh:0,done:false,created:new Date().toISOString(),content:upC.substring(0,50000)});
+  let d=load();d.books.push({id:Date.now().toString(36),title:t,author:a,category:'文学',chapters:Math.max(1,Math.ceil(upC.length/3000)),curCh:0,done:false,readTime:0,created:new Date().toISOString(),content:upC.substring(0,50000)});
   if(!d.cur.length){d.cur=[d.books[d.books.length-1].id]}
   save(d);hideUpload();document.getElementById('upT').value='';document.getElementById('upA').value='';upC='';renderAll();toast('📤 已上传'+t)}
 // ====== READING ======
 let rTimer=null,rSec=0,rOn=false;
+function fmtTime(s){const m=Math.floor(s/60),h=Math.floor(m/60);return h>0?h+'时'+(m%60)+'分':m+'分'+(s%60)+'秒'}
+function saveReadTime(d,b){if(!b)return;const d2=d||load();const b2=b||d2.books.find(x=>x.id===d2.cur[0]);if(!b2||!rSec)return;b2.readTime=(b2.readTime||0)+rSec;rSec=0;save(d2)}
 function enterRead(){const d=load();if(!d.cur.length){document.getElementById('readAct').style.display='none';document.getElementById('readEm').style.display='block';return}
   document.getElementById('readAct').style.display='block';document.getElementById('readEm').style.display='none';
   const b=d.books.find(x=>x.id===d.cur[0]);if(!b){document.getElementById('readAct').style.display='none';document.getElementById('readEm').style.display='block';return}
   const e=env();const sn={dawn:'黎明的微光',morning:'阳光洒在书页上',afternoon:'午后时光',sunset:'黄昏的光线',evening:'台灯亮起来了',night:'深夜，全世界都睡了'};
-  document.getElementById('rSc').textContent='📖 '+(sn[e.ti]||'温暖的灯光下');document.getElementById('rBk').textContent='《'+b.title+'》';renderRS();renderLdr(d,b)}
-function renderRS(){const d=load(),b=d.books.find(x=>x.id===d.cur[0]);if(!b)return;const ch=b.curCh||0;document.getElementById('rCh').textContent='第 '+(ch+1)+' 章';document.getElementById('rPr').style.width=(ch/b.chapters*100)+'%';document.getElementById('rPT').textContent=ch+'/'+b.chapters+' 章'}
-function togRead(){const btn=document.getElementById('rStart');if(rOn){stopR();btn.innerHTML='▶ 开始';btn.className='btn bp'}else{startR();btn.innerHTML='⏸ 暂停';btn.className='btn bs'}rOn=!rOn}
+  document.getElementById('rSc').textContent='📖 '+(sn[e.ti]||'温暖的灯光下');document.getElementById('rBk').textContent='《'+b.title+'》';renderRS();renderLdr(d,b);rSec=0;document.getElementById('rTim').innerHTML='00:00<span class="u">本次阅读</span>';rCum()}
+function rCum(){const d=load(),b=d.books.find(x=>x.id===d.cur[0]);document.getElementById('rCum').textContent=b&&b.readTime?'📚 累计阅读 '+fmtTime(b.readTime):''}
+function renderRS(){const d=load(),b=d.books.find(x=>x.id===d.cur[0]);if(!b)return;const ch=b.curCh||0;document.getElementById('rCh').textContent='第 '+(ch+1)+' 章';document.getElementById('rPr').style.width=(ch/b.chapters*100)+'%';document.getElementById('rPT').textContent=ch+'/'+b.chapters+' 章';rCum()}
+function togRead(){const btn=document.getElementById('rStart');if(rOn){const d=load(),b=d.books.find(x=>x.id===d.cur[0]);saveReadTime(d,b);stopR();btn.innerHTML='▶ 开始';btn.className='btn bp';rCum()}else{rSec=0;document.getElementById('rTim').innerHTML='00:00<span class="u">本次阅读</span>';startR();btn.innerHTML='⏸ 暂停';btn.className='btn bs'}rOn=!rOn}
 function startR(){if(rTimer)clearInterval(rTimer);rTimer=setInterval(()=>{rSec++;const m=String(Math.floor(rSec/60)).padStart(2,'0'),s=String(rSec%60).padStart(2,'0');document.getElementById('rTim').innerHTML=m+':'+s+'<span class="u">本次阅读</span>'},1000)}
 function stopR(){if(rTimer){clearInterval(rTimer);rTimer=null}}
 function markDone(){let d=load();const b=d.books.find(x=>x.id===d.cur[0]);if(!b){toast('还没有读书');return}const ch=b.curCh||0;if(ch>=b.chapters){toast('🎉 已读完！');return}
-  stopR();rOn=false;document.getElementById('rStart').innerHTML='▶ 开始';document.getElementById('rStart').className='btn bp';
+  const sTime=rSec;saveReadTime(d,b);stopR();rOn=false;document.getElementById('rStart').innerHTML='▶ 开始';document.getElementById('rStart').className='btn bp';
   const e=env();if(e.ti==='night')d.nightS++;if(e.ti==='dawn'||e.ti==='morning')d.morningS++;
   const base=20,streakB=sb(d),tb=Math.min(20,Math.floor(rSec/60));const xp=base+streakB+tb;
   b.curCh=ch+1;d.totalChapters++;d.totalPages+=5+Math.floor(Math.random()*10);
@@ -685,8 +689,8 @@ function markDone(){let d=load();const b=d.books.find(x=>x.id===d.cur[0]);if(!b)
   addXp(d,xp,'r');if(streakB>0)addXp(d,streakB,'s');
   if(b.curCh>=b.chapters){b.done=true;d.finishedBooks++;d.cur=d.cur.filter(id=>id!==b.id);if(!d.cur.length)d.cur=[d.books.find(x=>!x.done)?.id].filter(Boolean)}
   checkAch(d);const l=lv(d.totalXp);d.level=l.lv;d.xpProg=l.pct;
-  d.journal.push({date:today,book:b.title,chapter:ch+1,xp:xp,time:rSec,timeOfDay:e.ti});
-  save(d);renderAll();rSec=0;document.getElementById('rTim').innerHTML='00:00<span class="u">本次阅读</span>';
+  d.journal.push({date:today,book:b.title,chapter:ch+1,xp:xp,time:sTime,timeOfDay:e.ti});
+  save(d);renderAll();rSec=0;document.getElementById('rTim').innerHTML='00:00<span class="u">本次阅读</span>';rCum();
   toast('📖 读完第'+(ch+1)+'章 +'+xp+' XP'+(streakB>0?' 🔥+'+streakB:''));
   if(b.curCh>=b.chapters){renderAll();enterRead()}else{renderRS();renderLdr(d,b)}}
 
